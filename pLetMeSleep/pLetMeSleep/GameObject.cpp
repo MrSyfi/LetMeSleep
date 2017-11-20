@@ -19,7 +19,7 @@ GameObject::~GameObject()
 {
 }
 
-void GameObject::update() {
+void GameObject::update(int i) {
 	
 	drawGameObject();
 }

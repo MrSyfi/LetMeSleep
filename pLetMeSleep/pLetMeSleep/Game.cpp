@@ -10,6 +10,8 @@
 #include "Components.h"
 #include "time.h"
 #include "Attack.h"
+#include "Item.h"
+#include "Boss.h"
 #include <vector>
 
 std::vector<Attack> attacks;
@@ -19,8 +21,10 @@ std::vector<Button> buttons;
 Player* player;
 Monster* enemy, *enemy2;
 Map* map;
+Boss* boss;
 Button* start;
 Button* quit;
+Item* item;
 SDL_Renderer* Game::renderer = nullptr;
 //Allows to not spam the attacks
 struct tm instant;
@@ -87,7 +91,9 @@ void Game::buildGame(const char* title, int xpos, int ypos, int width, int heigh
 		buttons.push_back(*start);
 		buttons.push_back(*quit);
 		map = new Map();
-
+		boss = nullptr; 
+		//Will seed the random at the beginning of the application for further needs
+		srand(time(NULL));
 		newPlayer.addComponent<PositionComponent>();
 
 
@@ -121,16 +127,29 @@ void Game::attack(int i) {
 
 void Game::clickStart() {
 	player = new Player("drawable/player.gif", 10, 40);
-	enemy = new Monster(("drawable/prof" + std::to_string(randomNbMonster(3)) + ".gif").c_str(), 100, 400);
-	enemy2 = new Monster(("drawable/prof" + std::to_string(randomNbMonster(3)) + ".gif").c_str(), 400, 400);
-	enemys.push_back(*enemy);
-	enemys.push_back(*enemy2);
+	addEnemies();
 	map->addMap();
 	std::cout << "SECOND" << std::endl;
 }
 
+void Game::addEnemies() {
+	//Adds the enemies to the current map
+	enemy = new Monster(("drawable/prof" + std::to_string(randomNbMonster(3)) + ".gif").c_str(), randomPosition(player->getX()), randomPosition(player->getY()));
+	enemy2 = new Monster(("drawable/prof" + std::to_string(randomNbMonster(3)) + ".gif").c_str(), randomPosition(player->getX()), randomPosition(player->getY()));
+	enemys.push_back(*enemy);
+	enemys.push_back(*enemy2);
+}
+
+void Game::addBoss() {
+	boss = new Boss("drawable/boss.gif", 320, 320);
+}
+int Game::randomPosition(int i) {
+	//Gives a random X or Y to the enemy, while being at at least 50 pixels from the player
+	int rand = std::rand() % 640;
+	return rand;
+}
+
 int Game::randomNbMonster(int max) {
-	srand(time(NULL));
 	return std::rand() % max + 1;
 }
 
@@ -204,7 +223,7 @@ void Game::handleEvents() {
 void Game::updateGame() {
 
 	if (player != nullptr) {
-		if (player->getHealth() == 0) {
+		if (player->getHealth() <= 0) {
 			delete player;
 			player = nullptr;
 			if (enemys.size() != 0) {
@@ -219,13 +238,127 @@ void Game::updateGame() {
 				}
 				attacks.clear();
 			}
+			if (item != nullptr) {
+				delete item;
+				item = nullptr;
+			}
+			map->loadMap("map_layout/layout_menu.txt");
+			start = new Button("drawable/start.gif", 192, 256);
+			quit = new Button("drawable/start.gif", 192, 384);
+			buttons.push_back(*start);
+			buttons.push_back(*quit);
+
 		}
 		else {
-			player->update();
+			player->update(defense);
+			if (boss != nullptr) {
+				player->collideWith(boss);
+			}
 			if (enemys.size() != 0) {
 				for (int i = 0; i < enemys.size(); i++) {
-					Monster * m = new Monster(enemys.at(i));
+					Monster * m = new Monster(enemys[i]);
 					player->collideWith(m);
+				}
+			}
+			else {
+				if (boss == nullptr) {
+					//Changes the room when all enemies have been killed and the player steps on one of the arrows
+					//As it is a sort of random maze, the previous room is not saved in memory
+					if (player->getX() >= 600 && player->getY() >= 270 && player->getY() <= 320) {
+						//ArrowRight
+						int rand = randomNbMonster(5);
+						if (rand == 1) {
+							addBoss();
+							map->loadMap("map_layout/layout_boss");
+							if (enemys.size() != 0) {
+								for (int i = 0; i < enemys.size(); i++) {
+									enemys.erase(enemys.begin() + i);
+								}
+								enemys.clear();
+							}
+						}
+						else {
+							addEnemies();
+							map->addMap();
+						}
+						player->setX(0);
+						player->newRoom();
+						if (item != nullptr) {
+							delete item;
+							item = nullptr;
+						}
+					}
+					else if (player->getY() >= 600 && player->getX() >= 270 && player->getX() <= 320) {
+						int rand = randomNbMonster(5);
+						if (rand == 1) {
+							addBoss();
+							map->loadMap("map_layout/layout_boss");
+							if (enemys.size() != 0) {
+								for (int i = 0; i < enemys.size(); i++) {
+									enemys.erase(enemys.begin() + i);
+								}
+								enemys.clear();
+							}
+						}
+						else {
+							addEnemies();
+							map->addMap();
+						}
+						player->setY(0);
+						player->newRoom();
+						if (item != nullptr) {
+							delete item;
+							item = nullptr;
+						}
+					}
+					else if (player->getX() <= 40 && player->getY() >= 270 && player->getY() <= 320) {
+						//ArrowLeft
+						int rand = randomNbMonster(5);
+						if (rand == 1) {
+							addBoss();
+							map->loadMap("map_layout/layout_boss");
+							if (enemys.size() != 0) {
+								for (int i = 0; i < enemys.size(); i++) {
+									enemys.erase(enemys.begin() + i);
+								}
+								enemys.clear();
+							}
+						}
+						else {
+							addEnemies();
+							map->addMap();
+						}
+						player->setX(600);
+						player->newRoom();
+						if (item != nullptr) {
+							delete item;
+							item = nullptr;
+						}
+					}
+					else if (player->getY() <= 40 && player->getX() >= 270 && player->getX() <= 320) {
+						//ArrowTop
+						int rand = randomNbMonster(5);
+						if (rand == 1) {
+							addBoss();
+							map->loadMap("map_layout/layout_boss");
+							if (enemys.size() != 0) {
+								for (int i = 0; i < enemys.size(); i++) {
+									enemys.erase(enemys.begin() + i);
+								}
+								enemys.clear();
+							}
+						}
+						else {
+							addEnemies();
+							map->addMap();
+						}
+						player->setY(600);
+						player->newRoom();
+						if (item != nullptr) {
+							delete item;
+							item = nullptr;
+						}
+					}
 				}
 			}
 		}
@@ -235,11 +368,18 @@ void Game::updateGame() {
 	if (enemys.size() != 0) {
 
 		for (int i = 0; i < enemys.size(); ) {
-			if (enemys.at(i).getHealth() == 0) {
+			if (enemys.at(i).getHealth() <= 0) {
+				if (item == nullptr) {
+					int rand = std::rand() % 2 + 1;
+					if (rand == 1) {
+						item = new Item("drawable/book_normal.gif", enemys.at(i).getX(), enemys.at(i).getY());
+					}
+				}
 				enemys.erase(enemys.begin() + i);
+
 			}
 			else {
-				enemys.at(i).update();
+				enemys.at(i).update(weakness);
 				if (player != nullptr) {
 					enemys.at(i).pathFinding(player);
 				}
@@ -261,25 +401,73 @@ void Game::updateGame() {
 				std::cout << "PROJECTILE EFFACE" << std::endl;
 			}
 			else {
-				attacks.at(i).update();
+				attacks.at(i).update(0);
 				i++;
 			}
 		}
+	}
 
+	if (item != nullptr) {
+		item->update(0);
+		item->collideWith(player);
+		if (item->isColl()) {
+			if (item->isDefense()) {
+				if (defense > 3) {
+					defense--;
+				}
+			}
+			else {
+				if (weakness <= 2) {
+					weakness++;
+				}
+			}
+			delete item;
+			item = nullptr;
+		}
 	}
 
 	if (buttons.size() != 0) {
 		for (int i = 0; i < buttons.size(); i++) {
-			buttons.at(i).update();
+			buttons.at(i).update(0);
 		}
 	}
 
+	if (boss != nullptr) {
+
+		if (boss->getHealth() <= 0) {
+			//GG WIN 
+			delete boss;
+			boss = nullptr;
+			if (attacks.size() != 0) {
+				for (int i = 0; i < attacks.size(); i++) {
+					attacks.erase(attacks.begin() + i);
+				}
+				attacks.clear();
+			}
+			if (player != nullptr) {
+				delete player;
+				player = nullptr;
+			}
+			map->loadMap("map_layout/layout_menu.txt");
+			start = new Button("drawable/start.gif", 192, 256);
+			quit = new Button("drawable/start.gif", 192, 384);
+			buttons.push_back(*start);
+			buttons.push_back(*quit);
+
+		}
+		else {
+			boss->update(weakness);
+			if (player != nullptr) {
+				boss->pathFinding(player);
+			}
+			if (attacks.size() != 0) {
+				for (int j = 0; j < attacks.size(); j++) {
+					boss->collideWith(new Attack(attacks.at(j)));
+				}
+			}
+		}
+	}
 	manager.update();
-
-
-	/*std::cout << newPlayer.getComponent<PositionComponent>().getX() << "," <<
-		newPlayer.getComponent<PositionComponent>().getY() << std::endl;*/
-
 }
 
 void Game::drawGame() {
@@ -305,6 +493,12 @@ void Game::drawGame() {
 		for (int i = 0; i < buttons.size(); i++) {
 			buttons.at(i).drawGameObject();
 		}
+	}
+	if (boss != nullptr) {
+		boss->drawGameObject();
+	}
+	if (item != nullptr) {
+		item->drawGameObject();
 	}
 	//Update the screen
 	SDL_RenderPresent(renderer);
@@ -334,6 +528,9 @@ void Game::destroyGame() {
 		}
 
 		attacks.clear();
+	}
+	if (boss != nullptr) {
+		delete boss;
 	}
 	//Destroy the subsystem
 	SDL_Quit();

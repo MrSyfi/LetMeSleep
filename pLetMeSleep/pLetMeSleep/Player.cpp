@@ -13,11 +13,11 @@ Player::Player(const char * textureSheet, int x, int y) : Actor(textureSheet,x,y
 {
 	t0 = 0;
 	isCollided = false;
-	this->setHealth(10);
-	this->setMaxHealth(10);
+	this->setHealth(100);
+	this->setMaxHealth(100);
 }
 
-void Player::update()
+void Player::update(int defense)
 {
 
 	int tmp = 32;
@@ -64,8 +64,8 @@ void Player::update()
 		if (!invicibility) {
 			if (isCollided) {
 				int tmp = getHealth();
-				std::cout << "Player lost 2HP" << std::endl;
-				this->setHealth(tmp - 2);
+				std::cout << "Player lost " << defense << "HP" << std::endl;
+				this->setHealth(tmp - defense);
 				isCollided = false;
 				//Gives invicibility frame to the player after getting hit, and sets the timer to the current one
 				invicibility = true;
@@ -90,6 +90,10 @@ void Player::isInvulnerable() {
 	
 }
 
+void Player::newRoom() {
+	invicibility = true;
+}
+
 void Player::collideWith(Monster* m)
 {
 
@@ -97,6 +101,12 @@ void Player::collideWith(Monster* m)
 	SDL_Rect* src_m = new SDL_Rect(m->getRect());
 	isCollided = collision(src_p->x, src_p->y, src_p->w, src_p->h, src_m->x, src_m->y, src_m->w, src_m->h);
 	
+}
+
+void Player::collideWith(Boss* b) {
+	SDL_Rect* src_p = new SDL_Rect(this->destRect);
+	SDL_Rect* src_m = new SDL_Rect(b->getRect());
+	isCollided = collision(src_p->x, src_p->y, src_p->w, src_p->h, src_m->x, src_m->y, src_m->w, src_m->h);
 }
 
 bool Player::collision(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)

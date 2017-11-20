@@ -24,7 +24,9 @@ bool Button::isOnTop(int mouseX, int mouseY)
 	return false;
 }
 
-void Button::update()
+
+
+void Button::update(int i)
 {
 	srcRect.h = 64;
 	srcRect.w = 128;

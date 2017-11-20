@@ -16,7 +16,7 @@ Map::Map()
 	grass = TextureManager::LoadTexture("map_texture/grass.jpg");
 	floor = TextureManager::LoadTexture("map_texture/floor.jpg");
 	rightArrow = TextureManager::LoadTexture("map_texture/arrowRight.gif");
-	bottomArrow = TextureManager::LoadTexture("map_texture/arrowBottom.gif");
+	bottomArrow = TextureManager::LoadTexture("map_texture/door.gif");
 	
 	loadMap("map_layouts/layout_menu.txt");
 	//addMap();

@@ -9,6 +9,6 @@ public:
 	~Button();
 	bool isOnTop(int mouseX, int mouseY);
 
-	void update() override;
+	void update(int i) override;
 };
 

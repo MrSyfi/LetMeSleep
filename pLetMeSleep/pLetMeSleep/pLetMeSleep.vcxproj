@@ -120,10 +120,12 @@
   <ItemGroup>
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="Attack.cpp" />
+    <ClCompile Include="Boss.cpp" />
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="Item.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Monster.cpp" />
@@ -133,12 +135,14 @@
   <ItemGroup>
     <ClInclude Include="Actor.h" />
     <ClInclude Include="Attack.h" />
+    <ClInclude Include="Boss.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="Collider.h" />
     <ClInclude Include="Components.h" />
     <ClInclude Include="ECSystem.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="Item.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="Monster.h" />
     <ClInclude Include="Player.h" />
@@ -147,12 +151,6 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="pLetMeSleep.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="drawable\background.bmp" />
-    <Image Include="drawable\background.jpg" />
-    <Image Include="drawable\message.bmp" />
-    <Image Include="drawable\message.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

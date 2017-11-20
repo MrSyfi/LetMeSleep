@@ -20,6 +20,12 @@ public:
 
 	void clickStart();
 
+	void addEnemies();
+
+	void addBoss();		//Adds the boss tho the map
+
+	int randomPosition(int i);
+
 	int randomNbMonster(int max);
 																									//This function allows to apply an image to a surface.
 	void handleEvents();																			//This function handle the events like closing the windows.
@@ -45,6 +51,9 @@ private:
 	bool isRunning;																					//This variable can stop the game loop when the user leave the game.
 	SDL_Window *window;
 
+	//Defense of the player and weakness of the enemies
+	int defense = 5;
+	int weakness = 2;
 	//Allows to set the time between attacks
 	int t0;
 };

@@ -7,7 +7,7 @@ public:
 	GameObject(const char* textureSheet, int x, int y);
 	~GameObject();
 	// Update is virtual, like that, an update method is applicable for each sort of GameObject.
-	virtual void update() = 0;
+	virtual void update(int i) = 0;
 
 	
 	void drawGameObject();
@@ -15,6 +15,8 @@ public:
 	SDL_Rect getRect() { return destRect; }
 	int getX() { return xpos; }
 	int getY() { return ypos; }
+	void setX(int x) { xpos = x; }
+	void setY(int y) { ypos = y; }
 	int getW() { return destRect.w; }
 	int getH() { return destRect.h; }
 	

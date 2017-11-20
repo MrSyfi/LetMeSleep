@@ -8,7 +8,7 @@ private:
 	
 public:
 	void move(int i);
-	void update();
+	void update(int i);
 	void stopMove();
 	Attack();
 	~Attack();

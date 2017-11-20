@@ -1,38 +1,36 @@
-#include "Monster.h"
+#include "Boss.h"
 #include "time.h"
 #include <iostream>
 #include "time.h"
-Monster::Monster()
+Boss::Boss()
 {
 }
 
-Monster::Monster(const char * textureSheet, int x, int y) : Actor(textureSheet,x,y)
+Boss::Boss(const char * textureSheet, int x, int y) : Actor(textureSheet, x, y)
 {
 	t0 = 0;
 	isCollided = false;
-	this->setHealth(6);
-	this->setMaxHealth(6);
+	this->setHealth(24);
+	this->setMaxHealth(24);
 }
 
 
-void Monster::update(int weakness)
+void Boss::update(int weakness)
 {
 	srand(time(NULL));
-	int random = std::rand() % 2 + 1;
-
-	if (random == 1) {
+	
 		xpos += dx;
 		ypos += dy;
-	}
+	
 
 	int sprite = 32;
 
 
-	srcRect.h = 32;
-	srcRect.w = 32;
+	srcRect.h = 64;
+	srcRect.w = 64;
 	/*if (srcRect.x ==64) {
-		srcRect.x = 0;
-		srcRect.y = 0;
+	srcRect.x = 0;
+	srcRect.y = 0;
 	}
 	else {
 	}*/
@@ -62,13 +60,13 @@ void Monster::update(int weakness)
 }
 
 
-void Monster::pathFinding(Player * p) {
-	
+void Boss::pathFinding(Player * p) {
+
 
 	//Number of pixels between the x and y positions of the monster and the player
 	int diffx = xpos - p->getX();
 	int diffy = ypos - p->getY();
-	
+
 	srand(time(NULL));
 	int random = std::rand() % 2 + 1;
 	// Allows to change either x or y at random
@@ -79,44 +77,44 @@ void Monster::pathFinding(Player * p) {
 		}
 		else if (diffx < 0) {
 			this->move(3);
-			
+
 		}
 		else if (diffy > 0) {
 			this->move(0);
-			
+
 		}
 		else if (diffy < 0) {
 			this->move(1);
-			
+
 		}
 	}
 	else {
 		if (diffy > 0) {
 			this->move(0);
-			
+
 		}
 		else if (diffy < 0) {
 			this->move(1);
-			
+
 		}
 		else if (diffx > 0) {
 			this->move(2);
-			
+
 		}
 		else if (diffx < 3) {
 			this->move(1);
-			
+
 		}
 
-		
+
 	}
 }
 
-Monster::~Monster()
+Boss::~Boss()
 {
 }
 
-void Monster::collideWith(Attack * a)
+void Boss::collideWith(Attack * a)
 {
 
 	SDL_Rect* src_p = new SDL_Rect(this->destRect);
@@ -125,7 +123,7 @@ void Monster::collideWith(Attack * a)
 
 }
 
-bool Monster::collision(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
+bool Boss::collision(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
 {
 	//Returns true if there is a collision between the monster and any attack from the player
 	if (x1 <= x2) {
@@ -142,7 +140,7 @@ bool Monster::collision(int x1, int y1, int w1, int h1, int x2, int y2, int w2, 
 }
 
 
-void Monster::isInvulnerable() {
+void Boss::isInvulnerable() {
 	//Will check if the invincibility frame for the monster is still on or not, and change the value in consequence
 	long delta = SDL_GetTicks() - t0;
 	//The invicibility frame is currently 0.4s

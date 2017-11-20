@@ -2,9 +2,11 @@
 #include "Actor.h"
 #include "Monster.h"
 #include "Attack.h"
+#include "Boss.h"
 #include <vector>
 using std::vector;
 class Monster;
+class Boss;
 
 class Player :
 	public Actor
@@ -12,9 +14,12 @@ class Player :
 public:
 	Player();
 	Player(const char* textureSheet, int x, int y);
-	void update() override;
+	void update(int defense);
+	//void update() override;
 	void isInvulnerable();
+	void newRoom();
 	void collideWith(Monster* m);
+	void collideWith(Boss* b);
 	bool collision(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2);
 	~Player();
 private:

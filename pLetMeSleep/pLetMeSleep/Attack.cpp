@@ -23,7 +23,8 @@ void Attack::move(int i)
 	}
 }
 
-void Attack::update()
+
+void Attack::update(int i)
 {
 
 		xpos += dx*3;
