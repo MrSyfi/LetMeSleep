@@ -15,8 +15,9 @@ Map::Map()
 	tile = TextureManager::LoadTexture("map_texture/tile.jpg");
 	grass = TextureManager::LoadTexture("map_texture/grass.jpg");
 	floor = TextureManager::LoadTexture("map_texture/floor.jpg");
-	rightArrow = TextureManager::LoadTexture("map_texture/arrowRight.gif");
+	doorRight = TextureManager::LoadTexture("map_texture/doorRight.gif");
 	bottomArrow = TextureManager::LoadTexture("map_texture/door.gif");
+	doorLeft
 	
 	loadMap("map_layouts/layout_menu.txt");
 	//addMap();
@@ -84,11 +85,13 @@ void Map::drawMap() {
 				TextureManager::draw(floor, srcRect, destRec);
 				break;
 			case 3:
-				TextureManager::draw(rightArrow, srcRect, destRec);
+				TextureManager::draw(doorRight, srcRect, destRec);
 				break;
 			case 4:
 				TextureManager::draw(bottomArrow, srcRect, destRec);
 				break;
+			case 5:
+				TextureManager::draw(doorLeft, srcRect, destRec);
 			default :
 				break;
 

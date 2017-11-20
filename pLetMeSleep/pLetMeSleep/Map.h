@@ -21,8 +21,9 @@ private:
 	SDL_Texture* tile;
 	SDL_Texture* grass;
 	SDL_Texture* floor;
-	SDL_Texture* rightArrow;
+	SDL_Texture* doorRight;
 	SDL_Texture* bottomArrow;
+	SDL_Texture* doorLeft;
 	
 	int map[20][20];
 
