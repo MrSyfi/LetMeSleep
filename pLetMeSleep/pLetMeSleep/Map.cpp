@@ -15,9 +15,9 @@ Map::Map()
 	tile = TextureManager::LoadTexture("map_texture/tile.jpg");
 	grass = TextureManager::LoadTexture("map_texture/grass.jpg");
 	floor = TextureManager::LoadTexture("map_texture/floor.jpg");
-	doorRight = TextureManager::LoadTexture("map_texture/doorRight.gif");
+	doorRight = TextureManager::LoadTexture("map_texture/doorRight.jpg");
 	bottomArrow = TextureManager::LoadTexture("map_texture/door.gif");
-	doorLeft
+	doorLeft = TextureManager::LoadTexture("map_texture/doorLeft.jpg");
 	
 	loadMap("map_layouts/layout_menu.txt");
 	//addMap();

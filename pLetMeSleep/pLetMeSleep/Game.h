@@ -33,6 +33,7 @@ public:
 
 	void drawGame();																				//This function manage the renderer.
 	void destroyGame();																				//This function destroy the game.
+	void destroyAllEntities();																		//This function removes all entities present from the game.
 	bool running() { return isRunning; }
 
 	static SDL_Renderer *renderer;
@@ -56,6 +57,12 @@ private:
 	int weakness = 2;
 	//Allows to set the time between attacks
 	int t0;
+
+	//Changes the type of button we are using
+	int buttonType;
+
+	//Will define if the game is in Pause or not
+	bool pause = false;
 };
 
 

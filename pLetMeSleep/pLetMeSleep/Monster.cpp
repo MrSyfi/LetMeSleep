@@ -10,8 +10,8 @@ Monster::Monster(const char * textureSheet, int x, int y) : Actor(textureSheet,x
 {
 	t0 = 0;
 	isCollided = false;
-	this->setHealth(6);
-	this->setMaxHealth(6);
+	this->setHealth(12);
+	this->setMaxHealth(12);
 }
 
 
@@ -25,7 +25,6 @@ void Monster::update(int weakness)
 		ypos += dy;
 	}
 
-	int sprite = 32;
 
 
 	srcRect.h = 32;

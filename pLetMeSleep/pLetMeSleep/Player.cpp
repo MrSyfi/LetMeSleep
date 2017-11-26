@@ -77,6 +77,10 @@ void Player::update(int defense)
 
 }
 
+bool Player::isColl() 
+{
+	return isCollided;
+}
 void Player::isInvulnerable() {
 	//Will check if the invincibility frame for the player is still on or not, and change the value in consequence
 	long delta = SDL_GetTicks()-t0;

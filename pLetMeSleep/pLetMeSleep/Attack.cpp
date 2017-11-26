@@ -44,6 +44,6 @@ void Attack::update(int i)
 }
 
 void Attack::stopMove() {
-	//Will stop moving if hits an enemy or a wall
+	//
 }
 

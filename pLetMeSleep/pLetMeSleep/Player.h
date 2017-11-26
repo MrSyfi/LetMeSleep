@@ -15,6 +15,7 @@ public:
 	Player();
 	Player(const char* textureSheet, int x, int y);
 	void update(int defense);
+	bool isColl();
 	//void update() override;
 	void isInvulnerable();
 	void newRoom();
