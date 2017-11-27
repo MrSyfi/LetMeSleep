@@ -18,6 +18,8 @@ public:
 
 	void attack(int i);
 
+	void menuButtons();
+
 	void clickStart();
 
 	void addEnemies();

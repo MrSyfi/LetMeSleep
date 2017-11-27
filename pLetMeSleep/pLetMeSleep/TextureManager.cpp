@@ -1,6 +1,5 @@
 #include "TextureManager.h"
 
-
 TextureManager::TextureManager()
 {
 }
@@ -22,6 +21,7 @@ SDL_Texture* TextureManager::LoadTexture(const char* filename) {
 	return text;
 
 }
+
 
 void TextureManager::draw(SDL_Texture* text, SDL_Rect srcRect, SDL_Rect destRect) {
 

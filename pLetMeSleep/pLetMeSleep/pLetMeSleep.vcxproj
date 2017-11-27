@@ -123,6 +123,7 @@
     <ClCompile Include="Boss.cpp" />
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="Collider.cpp" />
+    <ClCompile Include="Container.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Item.cpp" />
@@ -139,6 +140,7 @@
     <ClInclude Include="Button.h" />
     <ClInclude Include="Collider.h" />
     <ClInclude Include="Components.h" />
+    <ClInclude Include="Container.h" />
     <ClInclude Include="ECSystem.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Game.h" />

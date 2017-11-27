@@ -12,17 +12,21 @@
 #include "Attack.h"
 #include "Item.h"
 #include "Boss.h"
+#include "Container.h"
 #include <vector>
 
-std::vector<Attack> attacks;
+using std::vector;
 
-std::vector<Monster> enemys;
-std::vector<Button> buttons;
+vector<Attack> attacks;
+vector<Monster> enemys;
+vector<Button> buttons;
+vector<Container> containers;
 Player* player;
+Container* menu_logo, *pause_logo, *about_logo;
 Monster* enemy, *enemy2, *enemy3;
 Map* map;
 Boss* boss;
-Button* start, *quit, *gameEnded, *pauseButton, *mainMenu;
+Button* start, *quit, *gameEnded, *pauseButton, *mainMenu, *about;
 Item* item;
 SDL_Renderer* Game::renderer = nullptr;
 //Allows to not spam the attacks
@@ -65,12 +69,16 @@ void Game::buildGame(const char* title, int xpos, int ypos, int width, int heigh
 		//Create a window(Title, dimensions, size and flag)
 		window = SDL_CreateWindow(title, xpos, ypos, width, height, flags);
 
+		//Launches the TTF library from SDL to show text on the screen
+		
+		
+
+
 		if (window) {	//If the window is created..
 
 			std::cout << "Window created ! " << std::endl;
 
 		}
-
 
 		//Create a rendering context for the window
 		renderer = SDL_CreateRenderer(window, -1, 0);
@@ -83,10 +91,10 @@ void Game::buildGame(const char* title, int xpos, int ypos, int width, int heigh
 		}
 
 		isRunning = true;
-		start = new Button("drawable/button_start.gif", 192, 256);
-		quit = new Button("drawable/button_exit.gif", 192, 384);
-		buttons.push_back(*start);
-		buttons.push_back(*quit);
+		
+
+
+		menuButtons();
 		buttonType = 0;
 		map = new Map();
 		boss = nullptr;
@@ -121,9 +129,23 @@ void Game::attack(int i) {
 	}
 }
 
+void Game::menuButtons() {
+	//This method will add the buttons inside the menu to the screen.
+	start = new Button("drawable/button_start.gif", 192, 256);
+	about = new Button("drawable/button_about.gif", 192, 384);
+	quit = new Button("drawable/button_exit.gif", 192, 512);
 
+	buttons.push_back(*start);
+	buttons.push_back(*about);
+	buttons.push_back(*quit);
+
+
+	menu_logo = new Container("drawable/endButton.jpg",85, 20, 225, 100);
+	containers.push_back(*menu_logo);
+}
 
 void Game::clickStart() {
+	//This method will create the player, change the map and add new enemies to the room.
 	player = new Player("drawable/player.gif", 10, 40);
 	addEnemies();
 	map->addMap();
@@ -183,12 +205,15 @@ void Game::handleEvents() {
 						mainMenu = new Button("drawable/button_main_menu.gif", 192, 384);
 						buttons.push_back(*pauseButton);
 						buttons.push_back(*mainMenu);
+						pause_logo = new Container("drawable/endButton.jpg", 82, 20, 225, 100);
+						containers.push_back(*pause_logo);
 					}
 					else {
 						pause = false;
 						buttonType = 2;
 						buttons.erase(buttons.begin());
 						buttons.clear();
+						containers.erase(containers.begin());
 					}
 				}; break;
 			case SDL_SCANCODE_UP: attack(0); break;
@@ -220,20 +245,35 @@ void Game::handleEvents() {
 			int x, y;
 			SDL_GetMouseState(&x, &y);
 			switch (buttonType) {
-			case 0:
+			case 0: //MainMenu
 				if (buttons.at(0).isOnTop(x, y)) {
 					for (int i = 0; i < buttons.size(); i++) {
 						buttons.erase(buttons.begin() + i);
 					}
 					buttons.clear();
 					clickStart();
+					containers.erase(containers.begin());
 					buttonType = 2;
 				}
 				else if (buttons.at(1).isOnTop(x, y)) {
+					buttonType = 3;
+					for (int i = 0; i < buttons.size(); i++) {
+						buttons.erase(buttons.begin() + i);
+					}
+					buttons.clear();
+					containers.erase(containers.begin());
+					about_logo = new Container("drawable/endButton.jpg", 0, 0, 320, 188);
+					containers.push_back(*about_logo);
+					buttons.push_back(*about);
+
+				}
+				else if (buttons.at(2).isOnTop(x, y)) {
 					isRunning = false;
-				}; break;
-			case  1:
+				}
+				; break;
+			case  1: //Game has been paused
 				if (buttons.at(0).isOnTop(x, y)) {
+
 					pause = false;
 					buttonType = 2;
 					buttons.erase(buttons.begin());
@@ -241,29 +281,37 @@ void Game::handleEvents() {
 				}
 				else if(buttons.at(1).isOnTop(x,y)){
 					pause = false;
+					//Go back to main menu so we destroy all the entities
 					destroyAllEntities();
 					buttons.erase(buttons.begin());
 					buttons.erase(buttons.begin());
 					buttons.clear();
 					buttonType = 0;
-					start = new Button("drawable/button_start.gif", 192, 256);
-					quit = new Button("drawable/button_exit.gif", 192, 384);
-					buttons.push_back(*start);
-					buttons.push_back(*quit);
+					menuButtons();
+					//Reset of all the upgrades
 					weakness = 2;
 					defense = 5;
 					
 				}
 				;
 				break;
-			case 2:
+			case 2: //Game over (player dead, boss beaten)
 				if (buttons.at(0).isOnTop(x, y)) {
 					buttons.erase(buttons.begin());
 					buttons.clear();
-					buttons.push_back(*start);
-					buttons.push_back(*quit);
+					menuButtons();
 					buttonType = 0;
 				}; break;
+			case 3 : 
+				if (buttons.at(0).isOnTop(x, y)) {
+					//Once the About button has been pressed again, we go back to the main menu
+					buttons.erase(buttons.begin());
+					buttons.clear();
+					containers.erase(containers.begin());
+					menuButtons();
+					buttonType = 0;
+				}
+				
 			default: break;
 			}
 		}
@@ -278,8 +326,10 @@ void Game::updateGame() {
 	if (!pause) {
 		if (player != nullptr) {
 			if (player->getHealth() <= 0) {
+				//Destroy all the current entities, remove the current layout and adds the gameover Button
 				destroyAllEntities();
 				map->loadMap("map_layout/layout_menu.txt");
+				containers.push_back(*menu_logo);
 				gameEnded = new Button("drawable/button_game_over.gif", 192, 256);
 				buttons.push_back(*gameEnded);
 
@@ -465,8 +515,9 @@ void Game::updateGame() {
 		if (boss != nullptr) {
 
 			if (boss->getHealth() <= 0) {
-				//GG WIN 
+				//When the boss is dead, we go to the Game over menu
 				destroyAllEntities();
+				containers.push_back(*menu_logo);
 				map->loadMap("map_layout/layout_menu.txt");
 				gameEnded = new Button("drawable/button_game_over.gif", 192, 256);
 				buttons.push_back(*gameEnded);
@@ -491,7 +542,11 @@ void Game::updateGame() {
 		}
 	}
 
-
+	if (containers.size() != 0) {
+		for (int i = 0; i < containers.size(); i++) {
+			containers.at(i).update(0);
+		}
+	}
 	manager.update();
 }
 
@@ -526,6 +581,12 @@ void Game::drawGame() {
 			buttons.at(i).drawGameObject();
 		}
 	}
+
+	if (containers.size() != 0) {
+		for (int i = 0; i < containers.size(); i++) {
+			containers.at(i).drawGameObject();
+		}
+	}
 	
 	//Update the screen
 	SDL_RenderPresent(renderer);
@@ -540,9 +601,11 @@ void Game::destroyGame() {
 
 	//Destroy the renderer
 	SDL_DestroyRenderer(renderer);
+
 	
 	destroyAllEntities();
 	//Destroy the subsystem
+	
 	SDL_Quit();
 	std::cout << "The game is cleared" << std::endl;
 
@@ -578,6 +641,12 @@ void Game::destroyAllEntities() {
 	if (item != nullptr) {
 		delete item;
 		item = nullptr;
+	}
+	if (containers.size() != 0) {
+		for (int i = 0; i < containers.size(); i++) {
+			containers.erase(containers.begin() + i);
+		}
+		containers.clear();
 	}
 }
 
