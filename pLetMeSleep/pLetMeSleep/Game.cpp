@@ -140,7 +140,7 @@ void Game::menuButtons() {
 	buttons.push_back(*quit);
 
 
-	menu_logo = new Container("drawable/endButton.jpg",85, 20, 225, 100);
+	menu_logo = new Container("drawable/menu_logo.gif",85, 20, 225, 100);
 	containers.push_back(*menu_logo);
 }
 
@@ -262,9 +262,10 @@ void Game::handleEvents() {
 					}
 					buttons.clear();
 					containers.erase(containers.begin());
-					about_logo = new Container("drawable/endButton.jpg", 0, 0, 320, 188);
+					about_logo = new Container("drawable/about_container.gif", 0, 0, 320, 188);
 					containers.push_back(*about_logo);
-					buttons.push_back(*about);
+					mainMenu = new Button("drawable/button_main_menu.gif", 192, 384);
+					buttons.push_back(*mainMenu);
 
 				}
 				else if (buttons.at(2).isOnTop(x, y)) {
