@@ -5,6 +5,7 @@ class Map
 public:
 
 	Map();
+	Map(int width, int height);
 	~Map();
 
 	int randomLayout(int max);
@@ -12,7 +13,8 @@ public:
 	void addMap();
 
 	void loadMap(std::string path);
-	void drawMap();
+	void drawMap(int width, int height);
+	//void drawMap();
 
 private:
 

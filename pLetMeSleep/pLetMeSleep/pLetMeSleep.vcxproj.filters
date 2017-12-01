@@ -57,6 +57,9 @@
     <ClCompile Include="Container.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Common.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -105,6 +108,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Container.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

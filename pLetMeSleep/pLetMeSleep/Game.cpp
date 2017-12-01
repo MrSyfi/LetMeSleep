@@ -12,6 +12,7 @@
 #include "Attack.h"
 #include "Item.h"
 #include "Boss.h"
+#include "Common.h"
 #include "Container.h"
 #include <vector>
 
@@ -44,11 +45,11 @@ Game::~Game()
 }
 
 int  Game::getScreenHeight() {
-	return SCREEN_HEIGHT;
+	return heightscreen;
 }
 
 int  Game::getScreenWidth() {
-	return SCREEN_WIDTH;
+	return widthscreen;
 }
 
 void Game::buildGame(const char* title, int xpos, int ypos, int width, int height, bool fullscreen) {
@@ -56,9 +57,8 @@ void Game::buildGame(const char* title, int xpos, int ypos, int width, int heigh
 	int flags = 0;
 
 	if (fullscreen) {
-
-		flags = SDL_WINDOW_FULLSCREEN;	//Define if the game is in fullscreen or not
-
+		this->fullscreen = true;
+		flags = SDL_WINDOW_FULLSCREEN_DESKTOP;	//Define if the game is in fullscreen or not
 	}
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {	//If the subsystem is not initialised..
@@ -69,9 +69,6 @@ void Game::buildGame(const char* title, int xpos, int ypos, int width, int heigh
 		//Create a window(Title, dimensions, size and flag)
 		window = SDL_CreateWindow(title, xpos, ypos, width, height, flags);
 
-		//Launches the TTF library from SDL to show text on the screen
-		
-		
 
 
 		if (window) {	//If the window is created..
@@ -79,7 +76,9 @@ void Game::buildGame(const char* title, int xpos, int ypos, int width, int heigh
 			std::cout << "Window created ! " << std::endl;
 
 		}
-
+		
+		//Will set the window size for width and height values
+		SDL_GetWindowSize(window, &widthscreen, &heightscreen);
 		//Create a rendering context for the window
 		renderer = SDL_CreateRenderer(window, -1, 0);
 
@@ -93,14 +92,19 @@ void Game::buildGame(const char* title, int xpos, int ypos, int width, int heigh
 		isRunning = true;
 		
 
-
+		//Display the start menu
 		menuButtons();
+		//Change the type of the menu's button
 		buttonType = 0;
-		map = new Map();
+		
+		map = new Map(getScreenWidth(), getScreenHeight());
+
 		boss = nullptr;
 		//Will seed the random at the beginning of the application for further needs
 		srand(time(NULL));
-		newPlayer.addComponent<PositionComponent>();
+
+
+		//newPlayer.addComponent<PositionComponent>(); STAND BY
 
 
 	}
@@ -119,8 +123,9 @@ void Game::attack(int i) {
 
 	//The user will need to wait that a bit between each attack$
 	long delta = SDL_GetTicks() - t0;
+	
 	if (delta > 500) {
-		int x = player->getX() + 16;
+		int x = player->getX() + 16; //16 is the middle size of the player
 		int y = player->getY() + 16;
 		Attack * at = new Attack("drawable/animShoot.gif", x, y);
 		at->move(i);
@@ -131,16 +136,25 @@ void Game::attack(int i) {
 
 void Game::menuButtons() {
 	//This method will add the buttons inside the menu to the screen.
-	start = new Button("drawable/button_start.gif", 192, 256);
-	about = new Button("drawable/button_about.gif", 192, 384);
-	quit = new Button("drawable/button_exit.gif", 192, 512);
+	
+	if (!fullscreen) {
+		start = new Button("drawable/button_start.gif", 192, 256);
+		about = new Button("drawable/button_about.gif", 192, 384);
+		quit = new Button("drawable/button_exit.gif", 192, 512);
+	}
+	else {
+		start = new Button("drawable/button_start.gif", getScreenWidth()/2, getScreenHeight() / 2);
+		about = new Button("drawable/button_about.gif", getScreenWidth()/2, getScreenHeight() - getScreenHeight() / 3);
+		quit = new Button("drawable/button_exit.gif", getScreenWidth()/2, getScreenHeight()/2 + getScreenHeight() / 3);
+	}
+
 
 	buttons.push_back(*start);
 	buttons.push_back(*about);
 	buttons.push_back(*quit);
 
 
-	menu_logo = new Container("drawable/menu_logo.gif",85, 20, 225, 100);
+	menu_logo = new Container("drawable/menu_logo.gif", getScreenWidth() / 2 - 225 , 100 + 50,  225, 100);
 	containers.push_back(*menu_logo);
 }
 
@@ -251,6 +265,7 @@ void Game::handleEvents() {
 						buttons.erase(buttons.begin() + i);
 					}
 					buttons.clear();
+					score = 0;
 					clickStart();
 					containers.erase(containers.begin());
 					buttonType = 2;
@@ -329,6 +344,10 @@ void Game::updateGame() {
 			if (player->getHealth() <= 0) {
 				//Destroy all the current entities, remove the current layout and adds the gameover Button
 				destroyAllEntities();
+				//The player loses 10 points if he dies
+				score -= 10;
+				if (score < 0) score = 0;
+				std::cout << "Score : " << score << std::endl;
 				map->loadMap("map_layout/layout_menu.txt");
 				containers.push_back(*menu_logo);
 				gameEnded = new Button("drawable/button_game_over.gif", 192, 256);
@@ -336,6 +355,7 @@ void Game::updateGame() {
 
 			}
 			else {
+				//Defense argument is the defense of the player at a t instant
 				player->update(defense);
 				if (boss != nullptr) {
 					player->collideWith(boss);
@@ -350,7 +370,7 @@ void Game::updateGame() {
 				}
 				else {
 					if (boss == nullptr) {
-						//Changes the room when all enemies have been killed and the player steps on one of the arrows
+						//Changes the room when all enemies have been killed and the player steps on one of the doors
 						//As it is a sort of random maze, the previous room is not saved in memory
 						if (player->getX() >= 600 && player->getY() >= 270 && player->getY() <= 320) {
 							//ArrowRight
@@ -457,6 +477,8 @@ void Game::updateGame() {
 
 			for (int i = 0; i < enemys.size(); ) {
 				if (enemys.at(i).getHealth() <= 0) {
+					score += 2;
+					std::cout << "Score : " << score << std::endl;
 					if (item == nullptr) {
 						int rand = std::rand() % 10 + 1;
 						if (rand == 1) {
@@ -516,6 +538,8 @@ void Game::updateGame() {
 		if (boss != nullptr) {
 
 			if (boss->getHealth() <= 0) {
+				score += 15;
+				std::cout << "Score : " << score << std::endl;
 				//When the boss is dead, we go to the Game over menu
 				destroyAllEntities();
 				containers.push_back(*menu_logo);
@@ -557,7 +581,7 @@ void Game::drawGame() {
 	SDL_RenderClear(renderer);
 
 	//This is where we would add stuff to render;
-	map->drawMap();
+	map->drawMap(widthscreen, heightscreen);
 	if (!pause) {
 		if (player != nullptr) 	player->drawGameObject();
 		if (enemys.size() != 0) {

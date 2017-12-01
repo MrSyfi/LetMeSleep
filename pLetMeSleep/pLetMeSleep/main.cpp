@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
 
 	game = new Game();
 
-	game->buildGame("Let me sleep", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 640, false);
+	game->buildGame("Let me sleep", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 640, true);
 
 	while (game->running()) {
 

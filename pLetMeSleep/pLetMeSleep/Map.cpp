@@ -29,6 +29,27 @@ Map::Map()
 	destRec.x = destRec.y = 0;
 
 }
+Map::Map(int width, int height)
+{
+
+	//Textures of all tile
+	tile = TextureManager::LoadTexture("map_texture/tile.jpg");
+	grass = TextureManager::LoadTexture("map_texture/grass.jpg");
+	floor = TextureManager::LoadTexture("map_texture/floor.jpg");
+	doorRight = TextureManager::LoadTexture("map_texture/doorRight.jpg");
+	bottomArrow = TextureManager::LoadTexture("map_texture/door.gif");
+	doorLeft = TextureManager::LoadTexture("map_texture/doorLeft.jpg");
+
+	loadMap("map_layouts/layout_menu.txt");
+	//addMap();
+	//Equivalent to src.x = 0 & src.y = 0
+	srcRect.x = srcRect.y = 0;
+	srcRect.w = destRec.w = width/20;
+	srcRect.h = destRec.h = height/20;
+
+	destRec.x = destRec.y = 0;
+
+}
 
 
 Map::~Map()
@@ -53,7 +74,7 @@ void Map::loadMap(std::string path)
 {	//Reads the number inside the file, then adds it to the map
 	std::ifstream file(path);
 	if (file.is_open()) {
-		for (int i = 0; i < 20; i++) {
+		for (int i = 0; i < 50; i++) {
 			for (int j = 0; j < 20; j++) {
 				file >> map[i][j];
 			}
@@ -61,7 +82,7 @@ void Map::loadMap(std::string path)
 	}
 }
 
-void Map::drawMap() {
+void Map::drawMap(int width, int height) {
 
 	int type = 0;
 
@@ -70,9 +91,8 @@ void Map::drawMap() {
 
 			type = map[i][j];
 
-			destRec.x = j * 32;
-			destRec.y = i * 32;
-
+			destRec.x = j * width/20;
+			destRec.y = i * height/20;
 			switch (type) {
 
 			case 0 : 

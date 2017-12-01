@@ -43,9 +43,8 @@ public:
 
 private:
 	//Screen size parameters
-	const int SCREEN_WIDTH = 1080;
+	const int SCREEN_WIDTH = 1920;
 	const int SCREEN_HEIGHT = 1080;
-	const int SCREEN_BPP = 32;
 	//Les surfaces que nous allons utiliser 
 	SDL_Surface *message = NULL;
 	SDL_Surface *background = NULL;
@@ -54,17 +53,26 @@ private:
 	bool isRunning;																					//This variable can stop the game loop when the user leave the game.
 	SDL_Window *window;
 
+	//Defines if the application is in fullscreen
+	bool fullscreen = false;
+
 	//Defense of the player and weakness of the enemies
 	int defense = 5;
 	int weakness = 2;
 	//Allows to set the time between attacks
 	int t0;
 
+	//The size of the screen
+	int widthscreen, heightscreen;
+
 	//Changes the type of button we are using
 	int buttonType;
 
 	//Will define if the game is in Pause or not
 	bool pause = false;
+
+	//Corresponds to the score the player will make	 during a game
+	int score;
 };
 
 
