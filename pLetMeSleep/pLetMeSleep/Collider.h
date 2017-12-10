@@ -1,15 +1,28 @@
 #pragma once
-class Player;
 
-/*
-* Abstract class who
-* manage the possible collision with the Hero.
-*/
+
+
 class Collider
 {
-public:
-	Collider();
-	virtual void collideWithHero(Player p) = 0;
-	~Collider();
+
+	/*SDL_Rect collider;
+	//return the name of the object collided
+	std::string tag;
+
+	TransformComponent* transform;
+
+	void init() override {
+
+		if (!entity->hasComponent<TransformComponent>()) {
+
+			entity->addComponent<TransformComponent>();
+
+		}
+		transform = &entity->getComponent<TransformComponent>();
+
+	}
+
+	*/
+
 };
 

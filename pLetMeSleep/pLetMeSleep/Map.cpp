@@ -54,6 +54,8 @@ Map::Map(int width, int height)
 
 Map::~Map()
 {
+
+
 }
 
 int Map::randomLayout(int max) {

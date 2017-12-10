@@ -39,6 +39,7 @@ public:
 	bool running() { return isRunning; }
 
 	static SDL_Renderer *renderer;
+	static SDL_Event event;
 
 
 private:
@@ -73,6 +74,8 @@ private:
 
 	//Corresponds to the score the player will make	 during a game
 	int score;
+
+
 };
 
 

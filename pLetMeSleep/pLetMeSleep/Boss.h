@@ -3,7 +3,10 @@
 #include "Collider.h"
 #include "Player.h"
 #include "Attack.h"
-#include <cstdlib>
+#include <cstdlib>7
+
+class Player;
+
 class Boss :
 	public Actor
 {

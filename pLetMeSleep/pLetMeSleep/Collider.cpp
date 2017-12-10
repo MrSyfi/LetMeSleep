@@ -2,11 +2,3 @@
 
 
 
-Collider::Collider()
-{
-}
-
-
-Collider::~Collider()
-{
-}

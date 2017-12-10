@@ -16,6 +16,7 @@
 #include "SDL_ttf.h"
 #include "Container.h"
 #include <vector>
+#include "Vector2D.h"
 
 using std::vector;
 
@@ -35,6 +36,8 @@ SDL_Renderer* Game::renderer = nullptr;
 struct tm instant;
 Manager manager;
 auto& newPlayer(manager.addEntity());
+
+SDL_Event Game::event;
 
 Game::Game()
 {
@@ -104,9 +107,10 @@ void Game::buildGame(const char* title, int xpos, int ypos, int width, int heigh
 		//Will seed the random at the beginning of the application for further needs
 		srand(time(NULL));
 
-
-		//newPlayer.addComponent<PositionComponent>(); STAND BY
-
+		//ECS
+		newPlayer.addComponent<TransformComponent>(100,100); 
+		newPlayer.addComponent<SpriteComponent>("drawable/boss.gif");
+		newPlayer.addComponent<KeyboardController>();
 
 	}
 	else {
@@ -198,7 +202,6 @@ int Game::randomNbMonster(int max) {
 
 void Game::handleEvents() {
 
-	SDL_Event event;
 	SDL_PollEvent(&event);
 	switch (event.type) {
 
@@ -350,7 +353,13 @@ void Game::handleEvents() {
 }
 
 void Game::updateGame() {
+
 	if (!pause) {
+
+		//ECS
+		manager.refresh();
+		manager.update();
+
 		if (player != nullptr) {
 			if (player->getHealth() <= 0) {
 				//Destroy all the current entities, remove the current layout and adds the gameover Button
@@ -583,7 +592,6 @@ void Game::updateGame() {
 			containers.at(i).update(0);
 		}
 	}
-	manager.update();
 }
 
 void Game::drawGame() {
@@ -594,6 +602,9 @@ void Game::drawGame() {
 	//This is where we would add stuff to render;
 	map->drawMap(widthscreen, heightscreen);
 	if (!pause) {
+
+		manager.draw();
+
 		if (player != nullptr) 	player->drawGameObject();
 		if (enemys.size() != 0) {
 			for (int i = 0; i < enemys.size(); i++) {

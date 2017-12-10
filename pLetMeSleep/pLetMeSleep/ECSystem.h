@@ -44,7 +44,7 @@ class Component {
 
 public:
 
-	Entity* Entity;
+	Entity* entity;
 
 	//Virtual because the method contains a body yet.
 	virtual void init(){}
@@ -73,11 +73,14 @@ public:
 		
 		//Auto : specifier than automatically deduce the type of the variable
 		for (auto& c : components) c->update();
-		for (auto& c : components) c->draw();
 
 	}
 
-	void draw(){}
+	void draw(){
+	
+		for (auto& c : components) c->draw();
+	
+	}
 	bool isActive() const { return active; }
 	void destroy() { active = false; }
 
@@ -92,7 +95,7 @@ public:
 	T& addComponent(TArgs&&... mArgs) {
 
 		T* c(new T(std::forward<TArgs>(mArgs)...));
-		c->Entity = this;
+		c->entity = this;
 		std::unique_ptr<Component> uPtr{ c };
 		components.emplace_back(std::move(uPtr));
 

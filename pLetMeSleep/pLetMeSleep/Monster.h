@@ -1,9 +1,11 @@
 #pragma once
 #include "Actor.h"
-#include "Collider.h"
 #include "Player.h"
 #include "Attack.h"
 #include <cstdlib>
+
+class Player;
+
 class Monster :
 	public Actor
 {
