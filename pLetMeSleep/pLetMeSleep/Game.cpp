@@ -13,6 +13,7 @@
 #include "Item.h"
 #include "Boss.h"
 #include "Common.h"
+#include "SDL_ttf.h"
 #include "Container.h"
 #include <vector>
 
@@ -24,7 +25,7 @@ vector<Button> buttons;
 vector<Container> containers;
 Player* player;
 Container* menu_logo, *pause_logo, *about_logo;
-Monster* enemy, *enemy2, *enemy3;
+Monster* enemy;
 Map* map;
 Boss* boss;
 Button* start, *quit, *gameEnded, *pauseButton, *mainMenu, *about;
@@ -63,7 +64,6 @@ void Game::buildGame(const char* title, int xpos, int ypos, int width, int heigh
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {	//If the subsystem is not initialised..
 
-
 		std::cout << "Subsystem Initialised!..." << std::endl;
 
 		//Create a window(Title, dimensions, size and flag)
@@ -87,17 +87,18 @@ void Game::buildGame(const char* title, int xpos, int ypos, int width, int heigh
 			SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 			std::cout << "Renderer created ! " << std::endl;
 
+
 		}
 
 		isRunning = true;
 		
+		
+		map = new Map(getScreenWidth(), getScreenHeight());
 
 		//Display the start menu
 		menuButtons();
 		//Change the type of the menu's button
 		buttonType = 0;
-		
-		map = new Map(getScreenWidth(), getScreenHeight());
 
 		boss = nullptr;
 		//Will seed the random at the beginning of the application for further needs
@@ -137,10 +138,12 @@ void Game::attack(int i) {
 void Game::menuButtons() {
 	//This method will add the buttons inside the menu to the screen.
 	
+
+	//If in fullscreen, will use the screen height and width values
 	if (!fullscreen) {
-		start = new Button("drawable/button_start.gif", 192, 256);
-		about = new Button("drawable/button_about.gif", 192, 384);
-		quit = new Button("drawable/button_exit.gif", 192, 512);
+		start = new Button("drawable/button_start.gif", getScreenWidth()/2 - 160, 256);
+		about = new Button("drawable/button_about.gif", getScreenWidth() / 2 - 160, 384);
+		quit = new Button("drawable/button_exit.gif", getScreenWidth() / 2 - 160, 512);
 	}
 	else {
 		start = new Button("drawable/button_start.gif", getScreenWidth()/2, getScreenHeight() / 2);
@@ -153,8 +156,8 @@ void Game::menuButtons() {
 	buttons.push_back(*about);
 	buttons.push_back(*quit);
 
-
-	menu_logo = new Container("drawable/menu_logo.gif", getScreenWidth() / 2 - 225 , 100 + 50,  225, 100);
+	map->loadMap("map_layouts/layout_menu.txt");
+	menu_logo = new Container("drawable/menu_logo.gif", getScreenWidth() / 2 - 225 , 50,  225, 100);
 	containers.push_back(*menu_logo);
 }
 
@@ -167,12 +170,16 @@ void Game::clickStart() {
 
 void Game::addEnemies() {
 	//Adds the enemies to the current map
-	enemy = new Monster(("drawable/prof" + std::to_string(randomNbMonster(3)) + ".gif").c_str(), randomPosition(player->getX()), randomPosition(player->getY()));
-	enemy2 = new Monster(("drawable/prof" + std::to_string(randomNbMonster(3)) + ".gif").c_str(), randomPosition(player->getX()), randomPosition(player->getY()));
-	enemy3 = new Monster(("drawable/prof" + std::to_string(randomNbMonster(3)) + ".gif").c_str(), randomPosition(player->getX()), randomPosition(player->getY()));
+	enemy = new Monster(("drawable/prof" + std::to_string(randomNbMonster(3)) + ".gif").c_str(), randomPosition(1), randomPosition(2));
 	enemys.push_back(*enemy);
-	enemys.push_back(*enemy2);
-	enemys.push_back(*enemy3);
+	enemy = new Monster(("drawable/prof" + std::to_string(randomNbMonster(3)) + ".gif").c_str(), randomPosition(1), randomPosition(2));
+	enemys.push_back(*enemy);
+	enemy = new Monster(("drawable/prof" + std::to_string(randomNbMonster(3)) + ".gif").c_str(), randomPosition(1), randomPosition(2));
+	enemys.push_back(*enemy);
+	enemy = new Monster(("drawable/prof" + std::to_string(randomNbMonster(3)) + ".gif").c_str(), randomPosition(1), randomPosition(2));
+	enemys.push_back(*enemy);
+	enemy = new Monster(("drawable/prof" + std::to_string(randomNbMonster(3)) + ".gif").c_str(), randomPosition(1), randomPosition(2));
+	enemys.push_back(*enemy);
 }
 
 void Game::addBoss() {
@@ -180,8 +187,8 @@ void Game::addBoss() {
 }
 int Game::randomPosition(int i) {
 	//Gives a random X or Y to the enemy, while being at at least 50 pixels from the player
-
-	return std::rand() % 640;
+	if (i == 1) return std::rand() % 1216 + 64;
+	return std::rand() % 608 + 32;
 }
 
 int Game::randomNbMonster(int max) {
@@ -215,11 +222,11 @@ void Game::handleEvents() {
 					if (!pause) {
 						pause = true;
 						buttonType = 1;
-						pauseButton = new Button("drawable/button_resume.gif", 192, 256);
-						mainMenu = new Button("drawable/button_main_menu.gif", 192, 384);
+						pauseButton = new Button("drawable/button_resume.gif", getScreenWidth() / 2 - 160, 256);
+						mainMenu = new Button("drawable/button_main_menu.gif", getScreenWidth() / 2 - 160, 384);
 						buttons.push_back(*pauseButton);
 						buttons.push_back(*mainMenu);
-						pause_logo = new Container("drawable/endButton.jpg", 82, 20, 225, 100);
+						pause_logo = new Container("drawable/endButton.jpg", getScreenWidth() / 2 - 225, 20, 225, 100);
 						containers.push_back(*pause_logo);
 					}
 					else {
@@ -271,16 +278,17 @@ void Game::handleEvents() {
 					buttonType = 2;
 				}
 				else if (buttons.at(1).isOnTop(x, y)) {
-					buttonType = 3;
+					buttonType = 4;
 					for (int i = 0; i < buttons.size(); i++) {
 						buttons.erase(buttons.begin() + i);
 					}
 					buttons.clear();
 					containers.erase(containers.begin());
-					about_logo = new Container("drawable/about_container.gif", 0, 0, 320, 188);
+					about_logo = new Container("drawable/about_container.gif", getScreenWidth() / 2 - 325, 0, 320, 188);
 					containers.push_back(*about_logo);
-					mainMenu = new Button("drawable/button_main_menu.gif", 192, 384);
+					mainMenu = new Button("drawable/button_main_menu.gif", getScreenWidth() / 2 - 160, 384);
 					buttons.push_back(*mainMenu);
+					buttonType = 3;
 
 				}
 				else if (buttons.at(2).isOnTop(x, y)) {
@@ -315,15 +323,18 @@ void Game::handleEvents() {
 				if (buttons.at(0).isOnTop(x, y)) {
 					buttons.erase(buttons.begin());
 					buttons.clear();
+					containers.erase(containers.begin());
+					containers.clear();
 					menuButtons();
 					buttonType = 0;
 				}; break;
 			case 3 : 
 				if (buttons.at(0).isOnTop(x, y)) {
-					//Once the About button has been pressed again, we go back to the main menu
+					//Once the A	bout button has been pressed again, we go back to the main menu
 					buttons.erase(buttons.begin());
 					buttons.clear();
 					containers.erase(containers.begin());
+					containers.clear();
 					menuButtons();
 					buttonType = 0;
 				}
@@ -350,7 +361,7 @@ void Game::updateGame() {
 				std::cout << "Score : " << score << std::endl;
 				map->loadMap("map_layout/layout_menu.txt");
 				containers.push_back(*menu_logo);
-				gameEnded = new Button("drawable/button_game_over.gif", 192, 256);
+				gameEnded = new Button("drawable/button_game_over.gif", getScreenWidth() / 2 - 160, 256);
 				buttons.push_back(*gameEnded);
 
 			}
@@ -372,7 +383,7 @@ void Game::updateGame() {
 					if (boss == nullptr) {
 						//Changes the room when all enemies have been killed and the player steps on one of the doors
 						//As it is a sort of random maze, the previous room is not saved in memory
-						if (player->getX() >= 600 && player->getY() >= 270 && player->getY() <= 320) {
+						if (player->getX() >= 1216 && player->getY() >= 256 && player->getY() <= 288) {
 							//ArrowRight
 							int rand = randomNbMonster(10);
 							if (rand == 1) {
@@ -396,7 +407,7 @@ void Game::updateGame() {
 								item = nullptr;
 							}
 						}
-						else if (player->getY() >= 600 && player->getX() >= 270 && player->getX() <= 320) {
+						else if (player->getY() >= 600 && player->getX() >= 522 && player->getX() <= 588) {
 							int rand = randomNbMonster(10);
 							if (rand == 1) {
 								addBoss();
@@ -443,7 +454,7 @@ void Game::updateGame() {
 								item = nullptr;
 							}
 						}
-						else if (player->getY() <= 40 && player->getX() >= 270 && player->getX() <= 320) {
+						else if (player->getY() <= 40 && player->getX() >= 522 && player->getX() <= 588) {
 							//ArrowTop
 							int rand = randomNbMonster(10);
 							if (rand == 1) {
@@ -506,7 +517,7 @@ void Game::updateGame() {
 
 		if (attacks.size() != 0) {
 			for (int i = 0; i < attacks.size();) {
-				if (attacks.at(i).getX() >= 640 || attacks.at(i).getX() <= 0 || attacks.at(i).getY() <= 0 || attacks.at(i).getY() >= 640) {
+				if (attacks.at(i).getX() >= 1280 || attacks.at(i).getX() <= 0 || attacks.at(i).getY() <= 0 || attacks.at(i).getY() >= 640) {
 					attacks.erase(attacks.begin() + i);
 				}
 				else {
@@ -544,7 +555,7 @@ void Game::updateGame() {
 				destroyAllEntities();
 				containers.push_back(*menu_logo);
 				map->loadMap("map_layout/layout_menu.txt");
-				gameEnded = new Button("drawable/button_game_over.gif", 192, 256);
+				gameEnded = new Button("drawable/button_game_over.gif", getScreenWidth() / 2 - 160, 256);
 				buttons.push_back(*gameEnded);
 
 			}
@@ -627,10 +638,10 @@ void Game::destroyGame() {
 	//Destroy the renderer
 	SDL_DestroyRenderer(renderer);
 
-	
+	//Destroy all the entities in case there are some remaining
 	destroyAllEntities();
 	//Destroy the subsystem
-	
+	TTF_Quit();
 	SDL_Quit();
 	std::cout << "The game is cleared" << std::endl;
 

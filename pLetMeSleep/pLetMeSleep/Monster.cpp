@@ -29,12 +29,6 @@ void Monster::update(int weakness)
 
 	srcRect.h = 32;
 	srcRect.w = 32;
-	/*if (srcRect.x ==64) {
-		srcRect.x = 0;
-		srcRect.y = 0;
-	}
-	else {
-	}*/
 	srcRect.x = 0;
 	srcRect.y = 0;
 
