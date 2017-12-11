@@ -21,8 +21,8 @@ private:
 	SDL_Rect srcRect, destRec;
 
 	SDL_Texture* tile;
-	SDL_Texture* grass;
-	SDL_Texture* floor;
+	SDL_Texture* desk;
+	SDL_Texture* wall;
 	SDL_Texture* doorRight;
 	SDL_Texture* bottomArrow;
 	SDL_Texture* doorLeft;

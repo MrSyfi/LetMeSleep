@@ -15,6 +15,8 @@ public:
 	Player();
 	Player(const char* textureSheet, int x, int y);
 	void update(int defense);
+	bool canActi();
+	void setActi(bool value);
 	bool isColl();
 	//void update() override;
 	void isInvulnerable();
@@ -32,5 +34,8 @@ private:
 	//Sets a delay between each attack;
 	int t0;
 	bool invicibility;
+
+	//Defines if the player can use the activable item he has or not
+	bool canUseActivable = false;
 };
 

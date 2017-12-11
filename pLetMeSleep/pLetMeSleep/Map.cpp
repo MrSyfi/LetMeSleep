@@ -8,34 +8,18 @@
 #include <random>
 #include "time.h"
 
-Map::Map()
+Map::Map() 
 {
 
-	//Textures of all tile
-	tile = TextureManager::LoadTexture("map_texture/tile.jpg");
-	grass = TextureManager::LoadTexture("map_texture/grass.jpg");
-	floor = TextureManager::LoadTexture("map_texture/floor.jpg");
-	doorRight = TextureManager::LoadTexture("map_texture/doorRight.jpg");
-	bottomArrow = TextureManager::LoadTexture("map_texture/door.gif");
-	doorLeft = TextureManager::LoadTexture("map_texture/doorLeft.jpg");
-	
-	loadMap("map_layouts/layout_menu.txt");
-	//addMap();
-	//Equivalent to src.x = 0 & src.y = 0
-	srcRect.x = srcRect.y = 0;
-	srcRect.w = destRec.w = 32;
-	srcRect.h = destRec.h = 32;
-
-	destRec.x = destRec.y = 0;
-
 }
+
 Map::Map(int width, int height)
 {
 
 	//Textures of all tile
 	tile = TextureManager::LoadTexture("map_texture/tile.jpg");
-	grass = TextureManager::LoadTexture("map_texture/grass.jpg");
-	floor = TextureManager::LoadTexture("map_texture/floor.jpg");
+	desk = TextureManager::LoadTexture("map_texture/desk.jpg");
+	wall = TextureManager::LoadTexture("map_texture/wall.jpg");
 	doorRight = TextureManager::LoadTexture("map_texture/doorRight.jpg");
 	bottomArrow = TextureManager::LoadTexture("map_texture/door.gif");
 	doorLeft = TextureManager::LoadTexture("map_texture/doorLeft.jpg");
@@ -101,10 +85,10 @@ void Map::drawMap(int width, int height) {
 				TextureManager::draw(tile, srcRect, destRec);
 				break;
 			case 1 :
-				TextureManager::draw(grass, srcRect, destRec);
+				TextureManager::draw(desk, srcRect, destRec);
 				break;
 			case 2 :
-				TextureManager::draw(floor, srcRect, destRec);
+				TextureManager::draw(wall, srcRect, destRec);
 				break;
 			case 3:
 				TextureManager::draw(doorRight, srcRect, destRec);

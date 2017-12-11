@@ -116,6 +116,14 @@ void Player::update(int defense)
 
 }
 
+bool Player::canActi() {
+	return canUseActivable;
+}
+
+void Player::setActi(bool value) {
+	this->canUseActivable = value;
+}
+
 bool Player::isColl()
 {
 	return isCollided;

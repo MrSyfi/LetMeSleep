@@ -8,11 +8,15 @@ Item::Item()
 
 
 
-Item::Item(const char * textureSheet, int x, int y) : GameObject(textureSheet, x, y)
+Item::Item(const char * textureSheet, int x, int y, bool isActive) : GameObject(textureSheet, x, y)
 {
 	srand(time(NULL));
+	this->isActive = isActive;
 	createItem();
 }
+
+
+
 
 
 Item::~Item()
@@ -36,19 +40,25 @@ void Item::update(int i)
 
 }
 void Item::createItem() {
-	int rand = std::rand() % 2 + 1;
+	//The behavior of the item will be different, depending if it is an activable or not
+	if (!isActive) {
+		int rand = std::rand() % 2 + 1;
 
-	if (rand == 1) {
-		defense = true;
+		if (rand == 1) {
+			defense = true;
+		}
+		else {
+			defense = false;
+		}
 	}
-	else {
-		defense = false;
-	}
-
 }
 
 bool Item::isColl() {
 	return isCollided;
+}
+
+bool Item::isActi() {
+	return isActive;
 }
 
 bool Item::isDefense() {

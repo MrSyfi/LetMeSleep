@@ -15,6 +15,9 @@ public:
 
 	void buildGame(const char* title, int xpos, int ypos, int width, int height, bool fullscreen);	//This function build the game.
 
+	void timer();
+
+
 
 	void attack(int i);
 
@@ -31,6 +34,7 @@ public:
 	int randomNbMonster(int max);
 																									//This function allows to apply an image to a surface.
 	void handleEvents();																			//This function handle the events like closing the windows.
+	void damageAllEnemies();
 	void updateGame();
 
 	void drawGame();																				//This function manage the renderer.
@@ -61,7 +65,10 @@ private:
 	int defense = 5;
 	int weakness = 2;
 	//Allows to set the time between attacks
-	int t0;
+	int t0, tButton;
+
+	//Defines if the buttons can be used or not, with a timer
+	bool buttonFrame=true;
 
 	//The size of the screen
 	int widthscreen, heightscreen;

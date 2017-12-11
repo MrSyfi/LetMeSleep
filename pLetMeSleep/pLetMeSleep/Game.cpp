@@ -24,6 +24,7 @@ vector<Attack> attacks;
 vector<Monster> enemys;
 vector<Button> buttons;
 vector<Container> containers;
+vector<Item> items;
 Player* player;
 Container* menu_logo, *pause_logo, *about_logo;
 Monster* enemy;
@@ -79,7 +80,7 @@ void Game::buildGame(const char* title, int xpos, int ypos, int width, int heigh
 			std::cout << "Window created ! " << std::endl;
 
 		}
-		
+
 		//Will set the window size for width and height values
 		SDL_GetWindowSize(window, &widthscreen, &heightscreen);
 		//Create a rendering context for the window
@@ -94,8 +95,8 @@ void Game::buildGame(const char* title, int xpos, int ypos, int width, int heigh
 		}
 
 		isRunning = true;
-		
-		
+
+
 		map = new Map(getScreenWidth(), getScreenHeight());
 
 		//Display the start menu
@@ -108,7 +109,7 @@ void Game::buildGame(const char* title, int xpos, int ypos, int width, int heigh
 		srand(time(NULL));
 
 		//ECS
-		newPlayer.addComponent<TransformComponent>(100,100); 
+		newPlayer.addComponent<TransformComponent>(100, 100);
 		newPlayer.addComponent<SpriteComponent>("drawable/boss.gif");
 		newPlayer.addComponent<KeyboardController>();
 
@@ -123,12 +124,21 @@ void Game::buildGame(const char* title, int xpos, int ypos, int width, int heigh
 
 }
 
+void Game::timer() {
+	//Defines if the user can press a button or not at the moment
+	long delta = SDL_GetTicks() - tButton;
+	if (delta > 200) {
+		buttonFrame = true;
+		tButton = SDL_GetTicks();
+	}
+}
+
 void Game::attack(int i) {
 	//Uses the Attack class to create an attack that will go in a direction, following the i code
 
 	//The user will need to wait that a bit between each attack$
 	long delta = SDL_GetTicks() - t0;
-	
+
 	if (delta > 500) {
 		int x = player->getX() + 16; //16 is the middle size of the player
 		int y = player->getY() + 16;
@@ -141,18 +151,18 @@ void Game::attack(int i) {
 
 void Game::menuButtons() {
 	//This method will add the buttons inside the menu to the screen.
-	
+
 
 	//If in fullscreen, will use the screen height and width values
 	if (!fullscreen) {
-		start = new Button("drawable/button_start.gif", getScreenWidth()/2 - 160, 256);
+		start = new Button("drawable/button_start.gif", getScreenWidth() / 2 - 160, 256);
 		about = new Button("drawable/button_about.gif", getScreenWidth() / 2 - 160, 384);
 		quit = new Button("drawable/button_exit.gif", getScreenWidth() / 2 - 160, 512);
 	}
 	else {
-		start = new Button("drawable/button_start.gif", getScreenWidth()/2, getScreenHeight() / 2);
-		about = new Button("drawable/button_about.gif", getScreenWidth()/2, getScreenHeight() - getScreenHeight() / 3);
-		quit = new Button("drawable/button_exit.gif", getScreenWidth()/2, getScreenHeight()/2 + getScreenHeight() / 3);
+		start = new Button("drawable/button_start.gif", getScreenWidth() / 2, getScreenHeight() / 2);
+		about = new Button("drawable/button_about.gif", getScreenWidth() / 2, getScreenHeight() - getScreenHeight() / 3);
+		quit = new Button("drawable/button_exit.gif", getScreenWidth() / 2, getScreenHeight() / 2 + getScreenHeight() / 3);
 	}
 
 
@@ -161,7 +171,7 @@ void Game::menuButtons() {
 	buttons.push_back(*quit);
 
 	map->loadMap("map_layouts/layout_menu.txt");
-	menu_logo = new Container("drawable/menu_logo.gif", getScreenWidth() / 2 - 225 , 50,  225, 100);
+	menu_logo = new Container("drawable/menu_logo.gif", getScreenWidth() / 2 - 225, 50, 225, 100);
 	containers.push_back(*menu_logo);
 }
 
@@ -218,26 +228,38 @@ void Game::handleEvents() {
 			case SDL_SCANCODE_S:	player->move(1); break;
 			case SDL_SCANCODE_A:	player->move(2);  break;
 			case SDL_SCANCODE_D:player->move(3); 	break;
+			case SDL_SCANCODE_E: if (player->canActi()) {
+									for (int i = 0; i < items.size(); i++) {
+										items.erase(items.begin() + i);
+									}
+									items.clear();
+									damageAllEnemies();
+									player->setActi(false);
+									}; break;
 			case SDL_SCANCODE_ESCAPE:
-				//If we are not on the mainMenu, the escape key will do something
-				if (buttonType != 0) {
-					//If we are in pause, we quit the pause, if we are not, we get in pause
-					if (!pause) {
-						pause = true;
-						buttonType = 1;
-						pauseButton = new Button("drawable/button_resume.gif", getScreenWidth() / 2 - 160, 256);
-						mainMenu = new Button("drawable/button_main_menu.gif", getScreenWidth() / 2 - 160, 384);
-						buttons.push_back(*pauseButton);
-						buttons.push_back(*mainMenu);
-						pause_logo = new Container("drawable/endButton.jpg", getScreenWidth() / 2 - 225, 20, 225, 100);
-						containers.push_back(*pause_logo);
-					}
-					else {
-						pause = false;
-						buttonType = 2;
-						buttons.erase(buttons.begin());
-						buttons.clear();
-						containers.erase(containers.begin());
+				timer();
+				if (buttonFrame) {
+					//If we are not on the mainMenu, the escape key will do something
+					if (buttonType != 0) {
+						//If we are in pause, we quit the pause, if we are not, we get in pause
+						if (!pause) {
+							pause = true;
+							buttonType = 1;
+							pauseButton = new Button("drawable/button_resume.gif", getScreenWidth() / 2 - 160, 256);
+							mainMenu = new Button("drawable/button_main_menu.gif", getScreenWidth() / 2 - 160, 384);
+							buttons.push_back(*pauseButton);
+							buttons.push_back(*mainMenu);
+							pause_logo = new Container("drawable/endButton.jpg", getScreenWidth() / 2 - 225, 20, 225, 100);
+							containers.push_back(*pause_logo);
+						}
+						else {
+							pause = false;
+							buttonType = 2;
+							buttons.erase(buttons.begin());
+							buttons.clear();
+							containers.erase(containers.begin());
+						}
+						buttonFrame = false;
 					}
 				}; break;
 			case SDL_SCANCODE_UP: attack(0); break;
@@ -265,90 +287,115 @@ void Game::handleEvents() {
 	case SDL_MOUSEBUTTONDOWN:
 		//Checks if the left or right click button is pressed when the mouse is placed on the button
 		if (buttons.size() != 0) {
-			//Checks if the right or left click is on top of the menu buttons
-			int x, y;
-			SDL_GetMouseState(&x, &y);
-			switch (buttonType) {
-			case 0: //MainMenu
-				if (buttons.at(0).isOnTop(x, y)) {
-					for (int i = 0; i < buttons.size(); i++) {
-						buttons.erase(buttons.begin() + i);
+			timer();
+			if (buttonFrame) {
+				//Checks if the right or left click is on top of the menu buttons
+				int x, y;
+				SDL_GetMouseState(&x, &y);
+				switch (buttonType) {
+				case 0: //MainMenu
+					if (buttons.at(0).isOnTop(x, y)) {
+						for (int i = 0; i < buttons.size(); i++) {
+							buttons.erase(buttons.begin() + i);
+						}
+						buttons.clear();
+						score = 0;
+						clickStart();
+						containers.erase(containers.begin());
+						buttonType = 2;
+						buttonFrame = false;
 					}
-					buttons.clear();
-					score = 0;
-					clickStart();
-					containers.erase(containers.begin());
-					buttonType = 2;
-				}
-				else if (buttons.at(1).isOnTop(x, y)) {
-					buttonType = 4;
-					for (int i = 0; i < buttons.size(); i++) {
-						buttons.erase(buttons.begin() + i);
+					else if (buttons.at(1).isOnTop(x, y)) {
+						buttonType = 4;
+						for (int i = 0; i < buttons.size(); i++) {
+							buttons.erase(buttons.begin() + i);
+						}
+						buttons.clear();
+						containers.erase(containers.begin());
+						about_logo = new Container("drawable/about_container.gif", getScreenWidth() / 2 - 325, 0, 320, 188);
+						containers.push_back(*about_logo);
+						mainMenu = new Button("drawable/button_main_menu.gif", getScreenWidth() / 2 - 160, 384);
+						buttons.push_back(*mainMenu);
+						buttonType = 3;
+						buttonFrame = false;
+
+
 					}
-					buttons.clear();
-					containers.erase(containers.begin());
-					about_logo = new Container("drawable/about_container.gif", getScreenWidth() / 2 - 325, 0, 320, 188);
-					containers.push_back(*about_logo);
-					mainMenu = new Button("drawable/button_main_menu.gif", getScreenWidth() / 2 - 160, 384);
-					buttons.push_back(*mainMenu);
-					buttonType = 3;
+					else if (buttons.at(2).isOnTop(x, y)) {
+						isRunning = false;
+					}
+					; break;
+				case  1: //Game has been paused
+					if (buttons.at(0).isOnTop(x, y)) {
 
-				}
-				else if (buttons.at(2).isOnTop(x, y)) {
-					isRunning = false;
-				}
-				; break;
-			case  1: //Game has been paused
-				if (buttons.at(0).isOnTop(x, y)) {
+						pause = false;
+						buttonType = 2;
+						containers.erase(containers.begin());
+						containers.clear();
+						buttons.erase(buttons.begin());
+						buttons.clear();
+						buttonFrame = false;
+					}
+					else if (buttons.at(1).isOnTop(x, y)) {
+						pause = false;
+						//Go back to main menu so we destroy all the entities
+						destroyAllEntities();
+						buttons.erase(buttons.begin());
+						buttons.erase(buttons.begin());
+						buttons.clear();
+						buttonType = 0;
+						menuButtons();
+						//Reset of all the upgrades
+						weakness = 2;
+						defense = 5;
+						buttonFrame = false;
 
-					pause = false;
-					buttonType = 2;
-					buttons.erase(buttons.begin());
-					buttons.clear();
+					}
+					;
+					break;
+				case 2: //Game over (player dead, boss beaten)
+					if (buttons.at(0).isOnTop(x, y)) {
+						buttons.erase(buttons.begin());
+						buttons.clear();
+						containers.erase(containers.begin());
+						containers.clear();
+						menuButtons();
+						buttonType = 0;
+						buttonFrame = false;
+					}; break;
+				case 3:
+					if (buttons.at(0).isOnTop(x, y)) {
+						//Once the A	bout button has been pressed again, we go back to the main menu
+						buttons.erase(buttons.begin());
+						buttons.clear();
+						containers.erase(containers.begin());
+						containers.clear();
+						menuButtons();
+						buttonType = 0;
+						buttonFrame = false;
+					}
+
+				default: break;
 				}
-				else if(buttons.at(1).isOnTop(x,y)){
-					pause = false;
-					//Go back to main menu so we destroy all the entities
-					destroyAllEntities();
-					buttons.erase(buttons.begin());
-					buttons.erase(buttons.begin());
-					buttons.clear();
-					buttonType = 0;
-					menuButtons();
-					//Reset of all the upgrades
-					weakness = 2;
-					defense = 5;
-					
-				}
-				;
-				break;
-			case 2: //Game over (player dead, boss beaten)
-				if (buttons.at(0).isOnTop(x, y)) {
-					buttons.erase(buttons.begin());
-					buttons.clear();
-					containers.erase(containers.begin());
-					containers.clear();
-					menuButtons();
-					buttonType = 0;
-				}; break;
-			case 3 : 
-				if (buttons.at(0).isOnTop(x, y)) {
-					//Once the A	bout button has been pressed again, we go back to the main menu
-					buttons.erase(buttons.begin());
-					buttons.clear();
-					containers.erase(containers.begin());
-					containers.clear();
-					menuButtons();
-					buttonType = 0;
-				}
-				
-			default: break;
 			}
 		}
 
 	default:
 		break;
 
+	}
+}
+
+void Game::damageAllEnemies() {
+	if (enemys.size() != 0) {
+		for (int i = 0; i < enemys.size(); i++)
+		{
+			enemys.at(i).bombHit();
+		}
+		for (int i = 0; i < items.size(); i++) {
+			items.erase(items.begin() + i);
+		}
+		items.clear();
 	}
 }
 
@@ -499,12 +546,20 @@ void Game::updateGame() {
 				if (enemys.at(i).getHealth() <= 0) {
 					score += 2;
 					std::cout << "Score : " << score << std::endl;
-					if (item == nullptr) {
-						int rand = std::rand() % 10 + 1;
-						if (rand == 1) {
-							item = new Item("drawable/book_normal.gif", enemys.at(i).getX(), enemys.at(i).getY());
+
+					int rand = std::rand() % 2 + 1;
+					if (rand == 1) {
+						int randActivable = std::rand() % 2 + 1;
+						if (randActivable == 1) {
+							item = new Item("drawable/itemActivable.gif", enemys.at(i).getX(), enemys.at(i).getY(), true);
+							items.push_back(*item);
+						}
+						else {
+							item = new Item("drawable/item.gif", enemys.at(i).getX(), enemys.at(i).getY(), false);
+							items.push_back(*item);
 						}
 					}
+
 					enemys.erase(enemys.begin() + i);
 
 				}
@@ -536,22 +591,32 @@ void Game::updateGame() {
 			}
 		}
 
-		if (item != nullptr) {
-			item->update(0);
-			item->collideWith(player);
-			if (item->isColl()) {
-				if (item->isDefense()) {
-					if (defense > 3) {
-						defense--;
+		if (items.size() != 0) {
+			for (int i = 0; i < items.size(); i++) {
+				items.at(i).update(0);
+				items.at(i).collideWith(player);
+				if (items.at(i).isColl()) {
+					if (!items.at(i).isActi()) {
+						if (items.at(i).isDefense()) {
+							if (defense > 3) {
+								defense--;
+							}
+						}
+						else {
+							if (weakness <= 2) {
+								weakness++;
+							}
+						}
+						items.erase(items.begin() + i);
+					}
+					else {
+						items.erase(items.begin() + i);
+						item = new Item("drawable/itemActivable.gif", 0, 0, true);
+						items.push_back(*item);
+						player->setActi(true);
 					}
 				}
-				else {
-					if (weakness <= 2) {
-						weakness++;
-					}
-				}
-				delete item;
-				item = nullptr;
+
 			}
 		}
 
@@ -619,8 +684,10 @@ void Game::drawGame() {
 		if (boss != nullptr) {
 			boss->drawGameObject();
 		}
-		if (item != nullptr) {
-			item->drawGameObject();
+		if (items.size() != 0) {
+			for (int i = 0; i < items.size(); i++) {
+				items.at(i).drawGameObject();
+			}
 		}
 	}
 	if (buttons.size() != 0) {
@@ -634,7 +701,7 @@ void Game::drawGame() {
 			containers.at(i).drawGameObject();
 		}
 	}
-	
+
 	//Update the screen
 	SDL_RenderPresent(renderer);
 
@@ -684,10 +751,13 @@ void Game::destroyAllEntities() {
 		delete boss;
 		boss = nullptr;
 	}
-	
-	if (item != nullptr) {
-		delete item;
-		item = nullptr;
+
+	if (items.size() != 0) {
+		for (int i = 0; i < items.size(); i++)
+		{
+			items.erase(items.begin() + i);
+		}
+		items.clear();
 	}
 	if (containers.size() != 0) {
 		for (int i = 0; i < containers.size(); i++) {

@@ -109,6 +109,12 @@ Monster::~Monster()
 {
 }
 
+void Monster::bombHit() {
+	int tmp = getHealth();
+	this->setHealth(tmp - 2);
+	std::cout << "BOMB HAS BEEN PLANTED" << std::endl;
+}
+
 void Monster::collideWith(Attack * a)
 {
 
