@@ -2,6 +2,9 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <string>
+#include <vector>
+
+class Collider;
 
 class Game
 {
@@ -42,8 +45,10 @@ public:
 	void destroyAllEntities();																		//This function removes all entities present from the game.
 	bool running() { return isRunning; }
 
+	static void addTitle(int id, int x, int y);
 	static SDL_Renderer *renderer;
 	static SDL_Event event;
+	static std::vector<Collider*> colliders;
 
 
 private:

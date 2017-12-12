@@ -10,7 +10,7 @@ class SpriteComponent : public Component
 private:
 
 	TransformComponent *transform;
-	SDL_Texture *texture;
+	SDL_Texture *text;
 	SDL_Rect srcRect, destRect;
 
 public:
@@ -19,13 +19,19 @@ public:
 	SpriteComponent() = default;
 	SpriteComponent(const char* path) {
 
-		texture = TextureManager::LoadTexture(path);
+		setText(path);
 
 	}
 
-	void setTex(const char* path) {
+	~SpriteComponent() {
 
-		texture = TextureManager::LoadTexture(path);
+		SDL_DestroyTexture(text);
+
+	}
+
+	void setText(const char* path) {
+
+		text = TextureManager::LoadTexture(path);
 
 	}
 
@@ -34,21 +40,24 @@ public:
 		transform = &entity->getComponent<TransformComponent>();
 
 		srcRect.x = srcRect.y = 0;
-		srcRect.w = srcRect.h = 32;
+		srcRect.w = transform->width;
+		srcRect.h = transform->height;
 		destRect.w = destRect.h = 64;
 
 	}
 
 	void update() override {
 
-		destRect.x = transform->position.x;
-		destRect.y = transform->position.y;
+		destRect.x = static_cast<int>(transform->position.x);
+		destRect.y = static_cast<int>(transform->position.y);
+		destRect.w = transform->width*transform->scale;
+		destRect.h = transform->height*transform->scale;
 
 	}
 
 	void draw() override {
 
-		TextureManager::draw(texture, srcRect, destRect);
+		TextureManager::draw(text, srcRect, destRect);
 
 	}
 

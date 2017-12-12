@@ -86,7 +86,7 @@ public:
 
 	template <typename T> bool hasComponent() const {
 
-		return componentBitSet[getComponentTypeID<T>];
+		return componentBitSet[getComponentTypeID<T>()];
 
 	}
 

@@ -17,6 +17,7 @@
 #include "Container.h"
 #include <vector>
 #include "Vector2D.h"
+#include "Collision.h"
 
 using std::vector;
 
@@ -36,7 +37,15 @@ SDL_Renderer* Game::renderer = nullptr;
 //Allows to not spam the attacks
 struct tm instant;
 Manager manager;
+
+std::vector<Collider*> Game::colliders;
+
 auto& newPlayer(manager.addEntity());
+auto& newWall(manager.addEntity());
+
+auto& tile0(manager.addEntity());
+auto& tile1(manager.addEntity());
+auto& tile2(manager.addEntity());
 
 SDL_Event Game::event;
 
@@ -109,9 +118,10 @@ void Game::buildGame(const char* title, int xpos, int ypos, int width, int heigh
 		srand(time(NULL));
 
 		//ECS
-		newPlayer.addComponent<TransformComponent>(100, 100);
+		newPlayer.addComponent<TransformComponent>(2);
 		newPlayer.addComponent<SpriteComponent>("drawable/boss.gif");
 		newPlayer.addComponent<KeyboardController>();
+		newPlayer.addComponent<Collider>("player");
 
 	}
 	else {
@@ -399,6 +409,13 @@ void Game::damageAllEnemies() {
 	}
 }
 
+void Game::addTitle(int id, int x, int y) {
+
+	auto& tile(manager.addEntity());
+	tile.addComponent<Tile>(id, x, y, 32, 32);
+
+}
+
 void Game::updateGame() {
 
 	if (!pause) {
@@ -406,6 +423,12 @@ void Game::updateGame() {
 		//ECS
 		manager.refresh();
 		manager.update();
+
+		for (auto col : colliders) {
+
+			Collision::isCollision(newPlayer.getComponent<Collider>(), *col);
+
+		}
 
 		if (player != nullptr) {
 			if (player->getHealth() <= 0) {

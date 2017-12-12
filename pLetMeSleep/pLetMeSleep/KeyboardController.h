@@ -2,7 +2,8 @@
 
 #include "Game.h"
 #include "ECSystem.h"
-#include "Components.h"
+#include "TransformComponent.h"
+
 
 class KeyboardController : public Component {
 

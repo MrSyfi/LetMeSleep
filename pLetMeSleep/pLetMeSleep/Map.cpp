@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <random>
 #include "time.h"
+#include "Game.h"
 
 Map::Map() 
 {
@@ -39,6 +40,12 @@ Map::Map(int width, int height)
 Map::~Map()
 {
 
+	SDL_DestroyTexture(tile);
+	SDL_DestroyTexture(desk);
+	SDL_DestroyTexture(wall);
+	SDL_DestroyTexture(doorRight);
+	SDL_DestroyTexture(bottomArrow);
+	SDL_DestroyTexture(doorLeft);
 
 }
 
@@ -66,6 +73,27 @@ void Map::loadMap(std::string path)
 			}
 		}
 	}
+
+	/*char tile;
+	std::fstream file;
+
+	file.open(path);
+
+	for (int i = 0; i < height; i++) {
+
+		for (int j = 0; j < width; j++) {
+
+			file.get(tile);
+			Game::addTitle(atoi(&tile), i * 32, j * 32);
+			std::cout << "done";
+
+		}
+
+	}
+
+	file.close();*/
+
+
 }
 
 void Map::drawMap(int width, int height) {

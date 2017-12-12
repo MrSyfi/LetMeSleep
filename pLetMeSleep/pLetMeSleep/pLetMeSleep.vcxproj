@@ -123,6 +123,7 @@
     <ClCompile Include="Boss.cpp" />
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="Collider.cpp" />
+    <ClCompile Include="Collision.cpp" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="Container.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -141,6 +142,7 @@
     <ClInclude Include="Boss.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="Collider.h" />
+    <ClInclude Include="Collision.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="Components.h" />
     <ClInclude Include="Container.h" />
@@ -152,6 +154,7 @@
     <ClInclude Include="Map.h" />
     <ClInclude Include="Monster.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="Tile.h" />
     <ClInclude Include="TransformComponent.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SpriteComponent.h" />
