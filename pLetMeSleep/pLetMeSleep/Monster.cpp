@@ -6,12 +6,11 @@ Monster::Monster()
 {
 }
 
-Monster::Monster(const char * textureSheet, int x, int y) : Actor(textureSheet,x,y)
+Monster::Monster(const char * textureSheet, int x, int y) : Actor(textureSheet, x, y)
 {
 	t0 = 0;
 	isCollided = false;
 	this->setHealth(12);
-	this->setMaxHealth(12);
 }
 
 
@@ -25,18 +24,16 @@ void Monster::update(int weakness)
 		ypos += dy;
 	}
 
-
-
-	srcRect.h = 32;
-	srcRect.w = 32;
-	srcRect.x = 0;
-	srcRect.y = 0;
-
+	srcRect.h = srcRect.w = 32;
+	srcRect.x = srcRect.y = 0;
 
 	destRect.x = xpos;
 	destRect.y = ypos;
 	destRect.w = srcRect.w * 2;
 	destRect.h = srcRect.h * 2;
+
+	//We call the isInvulnerable() method to check if the monster
+	// or the boss can be damaged again
 	isInvulnerable();
 
 	if (!invincibility) {
@@ -145,11 +142,8 @@ void Monster::isInvulnerable() {
 	//Will check if the invincibility frame for the monster is still on or not, and change the value in consequence
 	long delta = SDL_GetTicks() - t0;
 	//The invicibility frame is currently 0.4s
-	if (delta >= 400) {
-		invincibility = false;
-	}
-	else {
-		invincibility = true;
-	}
+	if (delta >= 400) invincibility = false;
+	else invincibility = true;
+	
 
 }

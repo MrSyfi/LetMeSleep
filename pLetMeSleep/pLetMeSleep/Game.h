@@ -46,6 +46,7 @@ public:
 	bool running() { return isRunning; }
 
 	static void addTitle(int id, int x, int y);
+	void newRoom();
 	static SDL_Renderer *renderer;
 	static SDL_Event event;
 	static std::vector<Collider*> colliders;

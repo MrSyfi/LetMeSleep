@@ -26,8 +26,8 @@ void Boss::update(int weakness)
 	int sprite = 32;
 
 
-	srcRect.h = 64;
-	srcRect.w = 64;
+	srcRect.h = 128;
+	srcRect.w = 128;
 	/*if (srcRect.x ==64) {
 	srcRect.x = 0;
 	srcRect.y = 0;

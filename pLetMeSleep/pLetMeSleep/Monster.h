@@ -16,7 +16,6 @@ public:
 	Monster();
 	Monster(const char* textureSheet, int x, int y);
 	void update(int weakness);
-	//void update() override;
 	void pathFinding(Player * p);
 	~Monster();
 	void bombHit();

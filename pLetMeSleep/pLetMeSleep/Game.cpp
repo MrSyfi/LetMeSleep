@@ -18,7 +18,6 @@
 #include <vector>
 #include "Vector2D.h"
 #include "Collision.h"
-
 using std::vector;
 
 vector<Attack> attacks;
@@ -34,15 +33,10 @@ Boss* boss;
 Button* start, *quit, *gameEnded, *pauseButton, *mainMenu, *about;
 Item* item;
 SDL_Renderer* Game::renderer = nullptr;
-//Allows to not spam the attacks
-struct tm instant;
 Manager manager;
-
 std::vector<Collider*> Game::colliders;
-
 auto& newPlayer(manager.addEntity());
 auto& newWall(manager.addEntity());
-
 auto& tile0(manager.addEntity());
 auto& tile1(manager.addEntity());
 auto& tile2(manager.addEntity());
@@ -69,69 +63,43 @@ int  Game::getScreenWidth() {
 void Game::buildGame(const char* title, int xpos, int ypos, int width, int height, bool fullscreen) {
 
 	int flags = 0;
-
 	if (fullscreen) {
 		this->fullscreen = true;
 		flags = SDL_WINDOW_FULLSCREEN_DESKTOP;	//Define if the game is in fullscreen or not
 	}
-
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {	//If the subsystem is not initialised..
-
 		std::cout << "Subsystem Initialised!..." << std::endl;
-
 		//Create a window(Title, dimensions, size and flag)
 		window = SDL_CreateWindow(title, xpos, ypos, width, height, flags);
-
-
-
 		if (window) {	//If the window is created..
-
 			std::cout << "Window created ! " << std::endl;
-
 		}
-
 		//Will set the window size for width and height values
 		SDL_GetWindowSize(window, &widthscreen, &heightscreen);
 		//Create a rendering context for the window
 		renderer = SDL_CreateRenderer(window, -1, 0);
-
 		if (renderer) { //If the renderer is created..
-
 			SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 			std::cout << "Renderer created ! " << std::endl;
-
-
 		}
-
 		isRunning = true;
-
-
 		map = new Map(getScreenWidth(), getScreenHeight());
-
 		//Display the start menu
 		menuButtons();
 		//Change the type of the menu's button
 		buttonType = 0;
-
 		boss = nullptr;
 		//Will seed the random at the beginning of the application for further needs
 		srand(time(NULL));
-
 		//ECS
 		newPlayer.addComponent<TransformComponent>(2);
 		newPlayer.addComponent<SpriteComponent>("drawable/boss.gif");
 		newPlayer.addComponent<KeyboardController>();
 		newPlayer.addComponent<Collider>("player");
-
 	}
 	else {
-
 		isRunning = false;
-
 	}
-
-
-
 }
 
 void Game::timer() {
@@ -145,12 +113,10 @@ void Game::timer() {
 
 void Game::attack(int i) {
 	//Uses the Attack class to create an attack that will go in a direction, following the i code
-
 	//The user will need to wait that a bit between each attack$
 	long delta = SDL_GetTicks() - t0;
-
 	if (delta > 500) {
-		int x = player->getX() + 16; //16 is the middle size of the player
+		int x = player->getX() + 16; //16 is the middle part of the player
 		int y = player->getY() + 16;
 		Attack * at = new Attack("drawable/animShoot.gif", x, y);
 		at->move(i);
@@ -161,25 +127,14 @@ void Game::attack(int i) {
 
 void Game::menuButtons() {
 	//This method will add the buttons inside the menu to the screen.
-
-
-	//If in fullscreen, will use the screen height and width values
-	if (!fullscreen) {
-		start = new Button("drawable/button_start.gif", getScreenWidth() / 2 - 160, 256);
-		about = new Button("drawable/button_about.gif", getScreenWidth() / 2 - 160, 384);
-		quit = new Button("drawable/button_exit.gif", getScreenWidth() / 2 - 160, 512);
-	}
-	else {
-		start = new Button("drawable/button_start.gif", getScreenWidth() / 2, getScreenHeight() / 2);
-		about = new Button("drawable/button_about.gif", getScreenWidth() / 2, getScreenHeight() - getScreenHeight() / 3);
-		quit = new Button("drawable/button_exit.gif", getScreenWidth() / 2, getScreenHeight() / 2 + getScreenHeight() / 3);
-	}
-
-
+	start = new Button("drawable/button_start.gif", getScreenWidth() / 2 - 160, 256);
+	about = new Button("drawable/button_about.gif", getScreenWidth() / 2 - 160, 384);
+	quit = new Button("drawable/button_exit.gif", getScreenWidth() / 2 - 160, 512);
+	//We add the buttons to the buttons vector
 	buttons.push_back(*start);
 	buttons.push_back(*about);
 	buttons.push_back(*quit);
-
+	//We load the layout we use for the menu, with the LetMeSleep logo over it
 	map->loadMap("map_layouts/layout_menu.txt");
 	menu_logo = new Container("drawable/menu_logo.gif", getScreenWidth() / 2 - 225, 50, 225, 100);
 	containers.push_back(*menu_logo);
@@ -194,20 +149,14 @@ void Game::clickStart() {
 
 void Game::addEnemies() {
 	//Adds the enemies to the current map
-	enemy = new Monster(("drawable/prof" + std::to_string(randomNbMonster(3)) + ".gif").c_str(), randomPosition(1), randomPosition(2));
-	enemys.push_back(*enemy);
-	enemy = new Monster(("drawable/prof" + std::to_string(randomNbMonster(3)) + ".gif").c_str(), randomPosition(1), randomPosition(2));
-	enemys.push_back(*enemy);
-	enemy = new Monster(("drawable/prof" + std::to_string(randomNbMonster(3)) + ".gif").c_str(), randomPosition(1), randomPosition(2));
-	enemys.push_back(*enemy);
-	enemy = new Monster(("drawable/prof" + std::to_string(randomNbMonster(3)) + ".gif").c_str(), randomPosition(1), randomPosition(2));
-	enemys.push_back(*enemy);
-	enemy = new Monster(("drawable/prof" + std::to_string(randomNbMonster(3)) + ".gif").c_str(), randomPosition(1), randomPosition(2));
-	enemys.push_back(*enemy);
+	for (int i = 0; i < 5; i++) {
+		enemy = new Monster(("drawable/prof" + std::to_string(randomNbMonster(3)) + ".gif").c_str(), randomPosition(1), randomPosition(2));
+		enemys.push_back(*enemy);
+	}
 }
 
 void Game::addBoss() {
-	boss = new Boss("drawable/boss.gif", 320, 320);
+	boss = new Boss(("drawable/prof" + std::to_string(randomNbMonster(3)) + ".gif").c_str(), randomPosition(1), randomPosition(2));
 }
 int Game::randomPosition(int i) {
 	//Gives a random X or Y to the enemy, while being at at least 50 pixels from the player
@@ -226,27 +175,25 @@ void Game::handleEvents() {
 	switch (event.type) {
 
 		//If the user close the windows..
-	case SDL_QUIT:
-		isRunning = false;	//The game loop is interrupted.
-		break;
-
+	case SDL_QUIT:	isRunning = false;	break; //The game loop is interrupted. 
 		//Allows the player to move in a direction following the pressed key
 	case SDL_KEYDOWN:
 		if (player != nullptr) {
 			switch (event.key.keysym.scancode) {
-			case SDL_SCANCODE_W: player->move(0);      break;
+			case SDL_SCANCODE_W:	player->move(0); break;
 			case SDL_SCANCODE_S:	player->move(1); break;
-			case SDL_SCANCODE_A:	player->move(2);  break;
-			case SDL_SCANCODE_D:player->move(3); 	break;
+			case SDL_SCANCODE_A:	player->move(2); break;
+			case SDL_SCANCODE_D:	player->move(3); break;
 			case SDL_SCANCODE_E: if (player->canActi()) {
-									for (int i = 0; i < items.size(); i++) {
-										items.erase(items.begin() + i);
-									}
-									items.clear();
-									damageAllEnemies();
-									player->setActi(false);
-									}; break;
+				//If the player can use its activable item
+				for (int i = 0; i < items.size(); i++) items.erase(items.begin() + i);
+				items.clear();
+				damageAllEnemies(); //Every enemies gets hit by the "smartphone bomb"
+				//The player will need to loot a new activable item to use it again
+				player->setActi(false);
+			}; break;
 			case SDL_SCANCODE_ESCAPE:
+				//We set a frame during the user cannot use buttons
 				timer();
 				if (buttonFrame) {
 					//If we are not on the mainMenu, the escape key will do something
@@ -280,20 +227,18 @@ void Game::handleEvents() {
 			}
 		}
 		break;
-
 		//Stops the actual movement once the key has been released
 	case SDL_KEYUP:
 		if (player != nullptr) {
 			switch (event.key.keysym.scancode) {
-			case SDL_SCANCODE_W: player->stopMove();      break;
-			case SDL_SCANCODE_S:	player->stopMove(); break;
-			case SDL_SCANCODE_A:	player->stopMove();  break;
-			case SDL_SCANCODE_D:player->stopMove(); 	break;
+			case SDL_SCANCODE_W: player->stopMove(); break;
+			case SDL_SCANCODE_S: player->stopMove(); break;
+			case SDL_SCANCODE_A: player->stopMove(); break;
+			case SDL_SCANCODE_D: player->stopMove(); break;
 			default: break;
 			}
 		}
 		break;
-
 	case SDL_MOUSEBUTTONDOWN:
 		//Checks if the left or right click button is pressed when the mouse is placed on the button
 		if (buttons.size() != 0) {
@@ -305,9 +250,7 @@ void Game::handleEvents() {
 				switch (buttonType) {
 				case 0: //MainMenu
 					if (buttons.at(0).isOnTop(x, y)) {
-						for (int i = 0; i < buttons.size(); i++) {
-							buttons.erase(buttons.begin() + i);
-						}
+						for (int i = 0; i < buttons.size(); i++) buttons.erase(buttons.begin() + i);
 						buttons.clear();
 						score = 0;
 						clickStart();
@@ -317,9 +260,7 @@ void Game::handleEvents() {
 					}
 					else if (buttons.at(1).isOnTop(x, y)) {
 						buttonType = 4;
-						for (int i = 0; i < buttons.size(); i++) {
-							buttons.erase(buttons.begin() + i);
-						}
+						for (int i = 0; i < buttons.size(); i++) buttons.erase(buttons.begin() + i);
 						buttons.clear();
 						containers.erase(containers.begin());
 						about_logo = new Container("drawable/about_container.gif", getScreenWidth() / 2 - 325, 0, 320, 188);
@@ -328,8 +269,6 @@ void Game::handleEvents() {
 						buttons.push_back(*mainMenu);
 						buttonType = 3;
 						buttonFrame = false;
-
-
 					}
 					else if (buttons.at(2).isOnTop(x, y)) {
 						isRunning = false;
@@ -337,7 +276,6 @@ void Game::handleEvents() {
 					; break;
 				case  1: //Game has been paused
 					if (buttons.at(0).isOnTop(x, y)) {
-
 						pause = false;
 						buttonType = 2;
 						containers.erase(containers.begin());
@@ -383,8 +321,7 @@ void Game::handleEvents() {
 						menuButtons();
 						buttonType = 0;
 						buttonFrame = false;
-					}
-
+					} break;
 				default: break;
 				}
 			}
@@ -398,13 +335,8 @@ void Game::handleEvents() {
 
 void Game::damageAllEnemies() {
 	if (enemys.size() != 0) {
-		for (int i = 0; i < enemys.size(); i++)
-		{
-			enemys.at(i).bombHit();
-		}
-		for (int i = 0; i < items.size(); i++) {
-			items.erase(items.begin() + i);
-		}
+		for (int i = 0; i < enemys.size(); i++) enemys.at(i).bombHit();
+		for (int i = 0; i < items.size(); i++) items.erase(items.begin() + i);
 		items.clear();
 	}
 }
@@ -413,7 +345,26 @@ void Game::addTitle(int id, int x, int y) {
 
 	auto& tile(manager.addEntity());
 	tile.addComponent<Tile>(id, x, y, 32, 32);
+}
 
+void Game::newRoom() {
+	//This method will decide if the next room will be a 
+	//boss room or just a normal enemies room
+	int rand = randomNbMonster(5);
+	//There is a chance out of 5 that the player will enter a boss room
+	if (rand == 1) {
+		addBoss();
+		for (int i = 0; i < enemys.size(); i++) enemys.erase(enemys.begin() + i);
+		enemys.clear();
+	}
+	else {
+		addEnemies();
+	}
+	map->addMap();
+	player->newRoom();
+	for (int i = 0; i < items.size(); i++) {
+		if (!items.at(i).isActi()) items.erase(items.begin() + i);
+	}
 }
 
 void Game::updateGame() {
@@ -425,6 +376,7 @@ void Game::updateGame() {
 		manager.update();
 
 		for (auto col : colliders) {
+
 
 			Collision::isCollision(newPlayer.getComponent<Collider>(), *col);
 
@@ -447,238 +399,133 @@ void Game::updateGame() {
 			else {
 				//Defense argument is the defense of the player at a t instant
 				player->update(defense);
-				if (boss != nullptr) {
-					player->collideWith(boss);
-				}
 				if (enemys.size() != 0) {
 					for (int i = 0; i < enemys.size(); i++) {
 						//Will check only if the player has not collided the previous enemies
-						if (!player->isColl()) {
-							player->collideWith(new Monster(enemys[i]));
-						}
+						if (!player->isColl()) player->collideWith(new Monster(enemys[i]));
 					}
 				}
 				else {
-					if (boss == nullptr) {
-						//Changes the room when all enemies have been killed and the player steps on one of the doors
-						//As it is a sort of random maze, the previous room is not saved in memory
-						if (player->getX() >= 1216 && player->getY() >= 256 && player->getY() <= 288) {
-							//ArrowRight
-							int rand = randomNbMonster(10);
-							if (rand == 1) {
-								addBoss();
-								map->loadMap("map_layout/layout_boss.txt");
-								if (enemys.size() != 0) {
-									for (int i = 0; i < enemys.size(); i++) {
-										enemys.erase(enemys.begin() + i);
-									}
-									enemys.clear();
-								}
-							}
-							else {
-								addEnemies();
-								map->addMap();
-							}
-							player->setX(0);
-							player->newRoom();
-							if (item != nullptr) {
-								delete item;
-								item = nullptr;
-							}
-						}
-						else if (player->getY() >= 600 && player->getX() >= 522 && player->getX() <= 588) {
-							int rand = randomNbMonster(10);
-							if (rand == 1) {
-								addBoss();
-								map->loadMap("map_layout/layout_boss.txt");
-								if (enemys.size() != 0) {
-									for (int i = 0; i < enemys.size(); i++) {
-										enemys.erase(enemys.begin() + i);
-									}
-									enemys.clear();
-								}
-							}
-							else {
-								addEnemies();
-								map->addMap();
-							}
-							player->setY(0);
-							player->newRoom();
-							if (item != nullptr) {
-								delete item;
-								item = nullptr;
-							}
-						}
-						else if (player->getX() <= 40 && player->getY() >= 270 && player->getY() <= 320) {
-							//ArrowLeft
-							int rand = randomNbMonster(10);
-							if (rand == 1) {
-								addBoss();
-								map->loadMap("map_layout/layout_boss.txt");
-								if (enemys.size() != 0) {
-									for (int i = 0; i < enemys.size(); i++) {
-										enemys.erase(enemys.begin() + i);
-									}
-									enemys.clear();
-								}
-							}
-							else {
-								addEnemies();
-								map->addMap();
-							}
-							player->setX(600);
-							player->newRoom();
-							if (item != nullptr) {
-								delete item;
-								item = nullptr;
-							}
-						}
-						else if (player->getY() <= 40 && player->getX() >= 522 && player->getX() <= 588) {
-							//ArrowTop
-							int rand = randomNbMonster(10);
-							if (rand == 1) {
-								addBoss();
-								map->loadMap("map_layout/layout_boss.txt");
-								if (enemys.size() != 0) {
-									for (int i = 0; i < enemys.size(); i++) {
-										enemys.erase(enemys.begin() + i);
-									}
-									enemys.clear();
-								}
-							}
-							else {
-								addEnemies();
-								map->addMap();
-							}
-							player->setY(600);
-							player->newRoom();
-							if (item != nullptr) {
-								delete item;
-								item = nullptr;
-							}
-						}
+					//Changes the room when all enemies have been killed and the player steps on one of the doors
+					//As it is a sort of random maze where the player is "teleported", the previous room is not saved in memory
+					if (player->getX() >= 1216 && player->getY() >= 256 && player->getY() <= 288) {
+						//Right
+						newRoom();
+						player->setX(0);
+
 					}
-				}
-			}
+					else if (player->getY() >= 600 && player->getX() >= 522 && player->getX() <= 588) {
+						//Bottom
+						newRoom();
+						player->setY(0);
 
-		}
-
-		if (enemys.size() != 0) {
-
-			for (int i = 0; i < enemys.size(); ) {
-				if (enemys.at(i).getHealth() <= 0) {
-					score += 2;
-					std::cout << "Score : " << score << std::endl;
-
-					int rand = std::rand() % 2 + 1;
-					if (rand == 1) {
-						int randActivable = std::rand() % 2 + 1;
-						if (randActivable == 1) {
-							item = new Item("drawable/itemActivable.gif", enemys.at(i).getX(), enemys.at(i).getY(), true);
-							items.push_back(*item);
-						}
-						else {
-							item = new Item("drawable/item.gif", enemys.at(i).getX(), enemys.at(i).getY(), false);
-							items.push_back(*item);
-						}
 					}
-
-					enemys.erase(enemys.begin() + i);
-
-				}
-				else {
-					enemys.at(i).update(weakness);
-					if (player != nullptr) {
-						enemys.at(i).pathFinding(player);
+					else if (player->getX() <= 40 && player->getY() >= 270 && player->getY() <= 320) {
+						//Left
+						newRoom();
+						player->setX(600);
 					}
-					if (attacks.size() != 0) {
-						for (int j = 0; j < attacks.size(); j++) {
-							enemys.at(i).collideWith(new Attack(attacks.at(j)));
-						}
+					else if (player->getY() <= 40 && player->getX() >= 522 && player->getX() <= 588) {
+						//Top
+						newRoom();
+						player->setY(600);
 					}
-					i++;
 				}
 			}
 		}
 
+	}
 
-		if (attacks.size() != 0) {
-			for (int i = 0; i < attacks.size();) {
-				if (attacks.at(i).getX() >= 1280 || attacks.at(i).getX() <= 0 || attacks.at(i).getY() <= 0 || attacks.at(i).getY() >= 640) {
-					attacks.erase(attacks.begin() + i);
-				}
-				else {
-					attacks.at(i).update(0);
-					i++;
-				}
-			}
-		}
-
-		if (items.size() != 0) {
-			for (int i = 0; i < items.size(); i++) {
-				items.at(i).update(0);
-				items.at(i).collideWith(player);
-				if (items.at(i).isColl()) {
-					if (!items.at(i).isActi()) {
-						if (items.at(i).isDefense()) {
-							if (defense > 3) {
-								defense--;
-							}
-						}
-						else {
-							if (weakness <= 2) {
-								weakness++;
-							}
-						}
-						items.erase(items.begin() + i);
+	if (enemys.size() != 0) {
+		for (int i = 0; i < enemys.size(); ) {
+			if (enemys.at(i).getHealth() <= 0) {
+				score += 2;
+				int rand = std::rand() % 5 + 1;
+				if (rand == 1) {
+					int randActivable = std::rand() % 3 + 1;
+					if (randActivable == 1) {
+						item = new Item("drawable/itemActivable.gif", enemys.at(i).getX(), enemys.at(i).getY(), true);
+						items.push_back(*item);
 					}
 					else {
-						items.erase(items.begin() + i);
-						item = new Item("drawable/itemActivable.gif", 0, 0, true);
+						item = new Item("drawable/item.gif", enemys.at(i).getX(), enemys.at(i).getY(), false);
 						items.push_back(*item);
-						player->setActi(true);
 					}
 				}
 
-			}
-		}
-
-		if (boss != nullptr) {
-
-			if (boss->getHealth() <= 0) {
-				score += 15;
-				std::cout << "Score : " << score << std::endl;
-				//When the boss is dead, we go to the Game over menu
-				destroyAllEntities();
-				containers.push_back(*menu_logo);
-				map->loadMap("map_layout/layout_menu.txt");
-				gameEnded = new Button("drawable/button_game_over.gif", getScreenWidth() / 2 - 160, 256);
-				buttons.push_back(*gameEnded);
+				enemys.erase(enemys.begin() + i);
 
 			}
 			else {
-				boss->update(weakness);
+				enemys.at(i).update(weakness);
 				if (player != nullptr) {
-					boss->pathFinding(player);
+					enemys.at(i).pathFinding(player);
 				}
 				if (attacks.size() != 0) {
 					for (int j = 0; j < attacks.size(); j++) {
-						boss->collideWith(new Attack(attacks.at(j)));
+						enemys.at(i).collideWith(new Attack(attacks.at(j)));
 					}
 				}
+				i++;
 			}
 		}
 	}
-	if (buttons.size() != 0) {
-		for (int i = 0; i < buttons.size(); i++) {
-			buttons.at(i).update(0);
+	if (boss != nullptr) {
+		if (boss->getHealth() <= 0) {
+			score += 15;
+			//When the boss is dead, we go to the Game over menu
+			destroyAllEntities();
+			containers.push_back(*menu_logo);
+			map->loadMap("map_layout/layout_menu.txt");
+			gameEnded = new Button("drawable/button_game_over.gif", getScreenWidth() / 2 - 160, 256);
+			buttons.push_back(*gameEnded);
+		}
+		else {
+			boss->update(weakness);
+			if (player != nullptr) boss->pathFinding(player);
+			if (attacks.size() != 0) {
+				for (int j = 0; j < attacks.size(); j++) boss->collideWith(new Attack(attacks.at(j)));
+			}
+		}
+	}
+	if (attacks.size() != 0) {
+		for (int i = 0; i < attacks.size();) {
+			if (attacks.at(i).getX() >= 1280 || attacks.at(i).getX() <= 0 || attacks.at(i).getY() <= 0 || attacks.at(i).getY() >= 640) {
+				//We erase the attack from the game if it goes out of the screen borders
+				attacks.erase(attacks.begin() + i);
+			}
+			else {
+				attacks.at(i).update(0);
+				i++;
+			}
 		}
 	}
 
-	if (containers.size() != 0) {
-		for (int i = 0; i < containers.size(); i++) {
-			containers.at(i).update(0);
+	if (items.size() != 0) {
+		for (int i = 0; i < items.size(); i++) {
+			items.at(i).update(0);
+			items.at(i).collideWith(player);
+			if (items.at(i).isColl()) {
+				if (!items.at(i).isActi()) {
+					if (items.at(i).isDefense()) if (defense > 3) defense--;
+					else if (weakness <= 2) weakness++;
+					items.erase(items.begin() + i);
+				}
+				else {
+					items.erase(items.begin() + i);
+					item = new Item("drawable/itemActivable.gif", 0, 0, true);
+					items.push_back(*item);
+					player->setActi(true);
+				}
+			}
 		}
+
+	}
+	if (buttons.size() != 0) {
+		for (int i = 0; i < buttons.size(); i++) buttons.at(i).update(0);
+	}
+	if (containers.size() != 0) {
+		for (int i = 0; i < containers.size(); i++) containers.at(i).update(0);
 	}
 }
 
@@ -686,13 +533,10 @@ void Game::drawGame() {
 
 	//Clear the rendering target
 	SDL_RenderClear(renderer);
-
 	//This is where we would add stuff to render;
 	map->drawMap(widthscreen, heightscreen);
 	if (!pause) {
-
 		manager.draw();
-
 		if (player != nullptr) 	player->drawGameObject();
 		if (enemys.size() != 0) {
 			for (int i = 0; i < enemys.size(); i++) {
@@ -704,14 +548,12 @@ void Game::drawGame() {
 				attacks.at(i).drawGameObject();
 			}
 		}
-		if (boss != nullptr) {
-			boss->drawGameObject();
-		}
 		if (items.size() != 0) {
 			for (int i = 0; i < items.size(); i++) {
 				items.at(i).drawGameObject();
 			}
 		}
+		if (boss != nullptr) boss->drawGameObject();
 	}
 	if (buttons.size() != 0) {
 		for (int i = 0; i < buttons.size(); i++) {
@@ -724,70 +566,46 @@ void Game::drawGame() {
 			containers.at(i).drawGameObject();
 		}
 	}
-
 	//Update the screen
 	SDL_RenderPresent(renderer);
-
 }
 
 void Game::destroyGame() {
-
-
 	//Destroy the window
 	SDL_DestroyWindow(window);
-
 	//Destroy the renderer
 	SDL_DestroyRenderer(renderer);
-
 	//Destroy all the entities in case there are some remaining
 	destroyAllEntities();
 	//Destroy the subsystem
-	TTF_Quit();
 	SDL_Quit();
 	std::cout << "The game is cleared" << std::endl;
-
 }
 
-
 void Game::destroyAllEntities() {
-
+	//We simply destroy every entities that can be used during a game (player, enemies, attacks, ...)
 	if (player != nullptr) {
 		delete player;
 		player = nullptr;
-	}
-
-	if (enemys.size() != 0) {
-		for (int i = 0; i < enemys.size(); i++) {
-			enemys.erase(enemys.begin() + i);
-		}
-		enemys.clear();
-	}
-
-	if (attacks.size() != 0) {
-		for (int i = 0; i < attacks.size(); i++) {
-			attacks.erase(attacks.begin() + i);
-		}
-
-		attacks.clear();
 	}
 	if (boss != nullptr) {
 		delete boss;
 		boss = nullptr;
 	}
-
+	if (enemys.size() != 0) {
+		for (int i = 0; i < enemys.size(); i++)	enemys.erase(enemys.begin() + i);
+		enemys.clear();
+	}
+	if (attacks.size() != 0) {
+		for (int i = 0; i < attacks.size(); i++) attacks.erase(attacks.begin() + i);
+		attacks.clear();
+	}
 	if (items.size() != 0) {
-		for (int i = 0; i < items.size(); i++)
-		{
-			items.erase(items.begin() + i);
-		}
+		for (int i = 0; i < items.size(); i++)	items.erase(items.begin() + i);
 		items.clear();
 	}
 	if (containers.size() != 0) {
-		for (int i = 0; i < containers.size(); i++) {
-			containers.erase(containers.begin() + i);
-		}
+		for (int i = 0; i < containers.size(); i++)	containers.erase(containers.begin() + i);
 		containers.clear();
 	}
 }
-
-
