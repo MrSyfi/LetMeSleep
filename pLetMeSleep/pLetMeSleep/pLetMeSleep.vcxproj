@@ -126,6 +126,7 @@
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="Container.cpp" />
+    <ClCompile Include="ECSystem.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Item.cpp" />

@@ -41,7 +41,21 @@ auto& tile0(manager.addEntity());
 auto& tile1(manager.addEntity());
 auto& tile2(manager.addEntity());
 
+
 SDL_Event Game::event;
+
+enum groupLabels : std::size_t {
+
+	groupMap,
+	groupPlayer,
+	groupEnemies,
+	groupColliders
+
+};
+
+auto& tiles(manager.getGroup(groupMap));
+auto& ennemies(manager.getGroup(groupEnemies));
+auto& colliders(manager.getGroup(groupColliders));
 
 Game::Game()
 {
@@ -96,6 +110,13 @@ void Game::buildGame(const char* title, int xpos, int ypos, int width, int heigh
 		newPlayer.addComponent<SpriteComponent>("drawable/boss.gif");
 		newPlayer.addComponent<KeyboardController>();
 		newPlayer.addComponent<Collider>("player");
+		newPlayer.addGroup(groupPlayer);
+
+		newWall.addComponent<TransformComponent>(300.0f, 300.0f, 300, 20, 1);
+		newWall.addComponent<SpriteComponent>("drawable/wall.jpg");
+		newWall.addComponent<Collider>("wall");
+		newWall.addGroup(groupMap);
+
 	}
 	else {
 		isRunning = false;
@@ -345,6 +366,7 @@ void Game::addTitle(int id, int x, int y) {
 
 	auto& tile(manager.addEntity());
 	tile.addComponent<Tile>(id, x, y, 32, 32);
+	tile.addGroup(groupMap);
 }
 
 void Game::newRoom() {
@@ -536,7 +558,19 @@ void Game::drawGame() {
 	//This is where we would add stuff to render;
 	map->drawMap(widthscreen, heightscreen);
 	if (!pause) {
-		manager.draw();
+		
+		//ECS
+		for (auto& t : tiles) {
+
+			t->draw();
+
+		}
+		for (auto& e : ennemies) {
+
+			e->draw();
+
+		}
+
 		if (player != nullptr) 	player->drawGameObject();
 		if (enemys.size() != 0) {
 			for (int i = 0; i < enemys.size(); i++) {

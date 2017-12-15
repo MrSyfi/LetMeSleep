@@ -66,6 +66,7 @@ public :
 		entity->addComponent<SpriteComponent>(path);
 		sprite = &entity->getComponent<SpriteComponent>();
 
+
 	}
 
 };
