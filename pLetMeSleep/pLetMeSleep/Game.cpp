@@ -44,6 +44,8 @@ auto& tile2(manager.addEntity());
 
 SDL_Event Game::event;
 
+const int Game::DEAD_ZONE = 15000;
+
 enum groupLabels : std::size_t {
 
 	groupMap,
@@ -81,7 +83,7 @@ void Game::buildGame(const char* title, int xpos, int ypos, int width, int heigh
 		this->fullscreen = true;
 		flags = SDL_WINDOW_FULLSCREEN_DESKTOP;	//Define if the game is in fullscreen or not
 	}
-	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {	//If the subsystem is not initialised..
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) == 0) {	//If the subsystem is not initialised..
 		std::cout << "Subsystem Initialised!..." << std::endl;
 		//Create a window(Title, dimensions, size and flag)
 		window = SDL_CreateWindow(title, xpos, ypos, width, height, flags);
@@ -192,165 +194,150 @@ int Game::randomNbMonster(int max) {
 
 void Game::handleEvents() {
 
-	SDL_PollEvent(&event);
-	switch (event.type) {
+	while (SDL_PollEvent(&event)) {
+		switch (event.type) {
 
-		//If the user close the windows..
-	case SDL_QUIT:	isRunning = false;	break; //The game loop is interrupted. 
-		//Allows the player to move in a direction following the pressed key
-	case SDL_KEYDOWN:
-		if (player != nullptr) {
-			switch (event.key.keysym.scancode) {
-			case SDL_SCANCODE_W:	player->move(0); break;
-			case SDL_SCANCODE_S:	player->move(1); break;
-			case SDL_SCANCODE_A:	player->move(2); break;
-			case SDL_SCANCODE_D:	player->move(3); break;
-			case SDL_SCANCODE_E: if (player->canActi()) {
-				//If the player can use its activable item
-				for (int i = 0; i < items.size(); i++) items.erase(items.begin() + i);
-				items.clear();
-				damageAllEnemies(); //Every enemies gets hit by the "smartphone bomb"
-				//The player will need to loot a new activable item to use it again
-				player->setActi(false);
-			}; break;
-			case SDL_SCANCODE_ESCAPE:
-				//We set a frame during the user cannot use buttons
-				timer();
-				if (buttonFrame) {
-					//If we are not on the mainMenu, the escape key will do something
-					if (buttonType != 0) {
-						//If we are in pause, we quit the pause, if we are not, we get in pause
-						if (!pause) {
-							pause = true;
-							buttonType = 1;
-							pauseButton = new Button("drawable/button_resume.gif", getScreenWidth() / 2 - 160, 256);
-							mainMenu = new Button("drawable/button_main_menu.gif", getScreenWidth() / 2 - 160, 384);
-							buttons.push_back(*pauseButton);
-							buttons.push_back(*mainMenu);
-							pause_logo = new Container("drawable/endButton.jpg", getScreenWidth() / 2 - 225, 20, 225, 100);
-							containers.push_back(*pause_logo);
-						}
-						else {
-							pause = false;
-							buttonType = 2;
-							buttons.erase(buttons.begin());
-							buttons.clear();
-							containers.erase(containers.begin());
-						}
-						buttonFrame = false;
-					}
+			//If the user close the windows..
+		case SDL_QUIT:	isRunning = false;	break; //The game loop is interrupted. 
+			//Allows the player to move in a direction following the pressed key
+		case SDL_KEYDOWN:
+			if (player != nullptr) {
+				switch (event.key.keysym.scancode) {
+				case SDL_SCANCODE_W:	player->move(0); break;
+				case SDL_SCANCODE_S:	player->move(1); break;
+				case SDL_SCANCODE_A:	player->move(2); break;
+				case SDL_SCANCODE_D:	player->move(3); break;
+				case SDL_SCANCODE_E: if (player->canActi()) {
+					//If the player can use its activable item
+					for (int i = 0; i < items.size(); i++) items.erase(items.begin() + i);
+					items.clear();
+					damageAllEnemies(); //Every enemies gets hit by the "smartphone bomb"
+					//The player will need to loot a new activable item to use it again
+					player->setActi(false);
 				}; break;
-			case SDL_SCANCODE_UP: attack(0); break;
-			case SDL_SCANCODE_DOWN: attack(1); break;
-			case SDL_SCANCODE_LEFT: attack(2); break;
-			case SDL_SCANCODE_RIGHT: attack(3); break;
-			default: break;
-			}
-		}
-		break;
-		//Stops the actual movement once the key has been released
-	case SDL_KEYUP:
-		if (player != nullptr) {
-			switch (event.key.keysym.scancode) {
-			case SDL_SCANCODE_W: player->stopMove(); break;
-			case SDL_SCANCODE_S: player->stopMove(); break;
-			case SDL_SCANCODE_A: player->stopMove(); break;
-			case SDL_SCANCODE_D: player->stopMove(); break;
-			default: break;
-			}
-		}
-		break;
-	case SDL_MOUSEBUTTONDOWN:
-		//Checks if the left or right click button is pressed when the mouse is placed on the button
-		if (buttons.size() != 0) {
-			timer();
-			if (buttonFrame) {
-				//Checks if the right or left click is on top of the menu buttons
-				int x, y;
-				SDL_GetMouseState(&x, &y);
-				switch (buttonType) {
-				case 0: //MainMenu
-					if (buttons.at(0).isOnTop(x, y)) {
-						for (int i = 0; i < buttons.size(); i++) buttons.erase(buttons.begin() + i);
-						buttons.clear();
-						score = 0;
-						clickStart();
-						containers.erase(containers.begin());
-						buttonType = 2;
-						buttonFrame = false;
-					}
-					else if (buttons.at(1).isOnTop(x, y)) {
-						buttonType = 4;
-						for (int i = 0; i < buttons.size(); i++) buttons.erase(buttons.begin() + i);
-						buttons.clear();
-						containers.erase(containers.begin());
-						about_logo = new Container("drawable/about_container.gif", getScreenWidth() / 2 - 325, 0, 320, 188);
-						containers.push_back(*about_logo);
-						mainMenu = new Button("drawable/button_main_menu.gif", getScreenWidth() / 2 - 160, 384);
-						buttons.push_back(*mainMenu);
-						buttonType = 3;
-						buttonFrame = false;
-					}
-					else if (buttons.at(2).isOnTop(x, y)) {
-						isRunning = false;
-					}
-					; break;
-				case  1: //Game has been paused
-					if (buttons.at(0).isOnTop(x, y)) {
-						pause = false;
-						buttonType = 2;
-						containers.erase(containers.begin());
-						containers.clear();
-						buttons.erase(buttons.begin());
-						buttons.clear();
-						buttonFrame = false;
-					}
-					else if (buttons.at(1).isOnTop(x, y)) {
-						pause = false;
-						//Go back to main menu so we destroy all the entities
-						destroyAllEntities();
-						buttons.erase(buttons.begin());
-						buttons.erase(buttons.begin());
-						buttons.clear();
-						buttonType = 0;
-						menuButtons();
-						//Reset of all the upgrades
-						weakness = 2;
-						defense = 5;
-						buttonFrame = false;
-
-					}
-					;
+				case SDL_SCANCODE_ESCAPE:
+					Pause();
 					break;
-				case 2: //Game over (player dead, boss beaten)
-					if (buttons.at(0).isOnTop(x, y)) {
-						buttons.erase(buttons.begin());
-						buttons.clear();
-						containers.erase(containers.begin());
-						containers.clear();
-						menuButtons();
-						buttonType = 0;
-						buttonFrame = false;
-					}; break;
-				case 3:
-					if (buttons.at(0).isOnTop(x, y)) {
-						//Once the A	bout button has been pressed again, we go back to the main menu
-						buttons.erase(buttons.begin());
-						buttons.clear();
-						containers.erase(containers.begin());
-						containers.clear();
-						menuButtons();
-						buttonType = 0;
-						buttonFrame = false;
-					} break;
+				case SDL_SCANCODE_UP: attack(0); break;
+				case SDL_SCANCODE_DOWN: attack(1); break;
+				case SDL_SCANCODE_LEFT: attack(2); break;
+				case SDL_SCANCODE_RIGHT: attack(3); break;
 				default: break;
 				}
 			}
+			break;
+			//Stops the actual movement once the key has been released
+		case SDL_KEYUP:
+			if (player != nullptr) {
+				switch (event.key.keysym.scancode) {
+				case SDL_SCANCODE_W: player->stopMove(); break;
+				case SDL_SCANCODE_S: player->stopMove(); break;
+				case SDL_SCANCODE_A: player->stopMove(); break;
+				case SDL_SCANCODE_D: player->stopMove(); break;
+				default: break;
+				}
+			}
+			break;
+		case SDL_MOUSEBUTTONDOWN:
+			//Checks if the left or right click button is pressed when the mouse is placed on the button
+			if (buttons.size() != 0) {
+				timer();
+				if (buttonFrame) {
+					//Checks if the right or left click is on top of the menu buttons
+					int x, y;
+					SDL_GetMouseState(&x, &y);
+					switch (buttonType) {
+					case 0: //MainMenu
+						if (buttons.at(0).isOnTop(x, y)) {
+							for (int i = 0; i < buttons.size(); i++) buttons.erase(buttons.begin() + i);
+							buttons.clear();
+							score = 0;
+							clickStart();
+							containers.erase(containers.begin());
+							buttonType = 2;
+							buttonFrame = false;
+						}
+						else if (buttons.at(1).isOnTop(x, y)) {
+							buttonType = 4;
+							for (int i = 0; i < buttons.size(); i++) buttons.erase(buttons.begin() + i);
+							buttons.clear();
+							containers.erase(containers.begin());
+							about_logo = new Container("drawable/about_container.gif", getScreenWidth() / 2 - 325, 0, 320, 188);
+							containers.push_back(*about_logo);
+							mainMenu = new Button("drawable/button_main_menu.gif", getScreenWidth() / 2 - 160, 384);
+							buttons.push_back(*mainMenu);
+							buttonType = 3;
+							buttonFrame = false;
+						}
+						else if (buttons.at(2).isOnTop(x, y)) {
+							isRunning = false;
+						}
+						; break;
+					case  1: //Game has been paused
+						if (buttons.at(0).isOnTop(x, y)) {
+							pause = false;
+							buttonType = 2;
+							containers.erase(containers.begin());
+							containers.clear();
+							buttons.erase(buttons.begin());
+							buttons.clear();
+							buttonFrame = false;
+						}
+						else if (buttons.at(1).isOnTop(x, y)) {
+							pause = false;
+							//Go back to main menu so we destroy all the entities
+							destroyAllEntities();
+							buttons.erase(buttons.begin());
+							buttons.erase(buttons.begin());
+							buttons.clear();
+							buttonType = 0;
+							menuButtons();
+							//Reset of all the upgrades
+							weakness = 2;
+							defense = 5;
+							buttonFrame = false;
+
+						}
+						;
+						break;
+					case 2: //Game over (player dead, boss beaten)
+						if (buttons.at(0).isOnTop(x, y)) {
+							buttons.erase(buttons.begin());
+							buttons.clear();
+							containers.erase(containers.begin());
+							containers.clear();
+							menuButtons();
+							buttonType = 0;
+							buttonFrame = false;
+						}; break;
+					case 3:
+						if (buttons.at(0).isOnTop(x, y)) {
+							//Once the A	bout button has been pressed again, we go back to the main menu
+							buttons.erase(buttons.begin());
+							buttons.clear();
+							containers.erase(containers.begin());
+							containers.clear();
+							menuButtons();
+							buttonType = 0;
+							buttonFrame = false;
+						} break;
+					default: break;
+					}
+				}
+			}
+
+		case SDL_CONTROLLERDEVICEADDED:
+			AddController(event.cdevice.which); break;
+		case SDL_CONTROLLERDEVICEREMOVED:
+			RemoveController(event.cdevice.which); break;
+		case SDL_CONTROLLERAXISMOTION:
+			OnControllerAxis(event.caxis); break;
+		case SDL_CONTROLLERBUTTONDOWN:
+			OnControllerButton(event.cbutton); break;
+		default:
+			break;
+
 		}
-
-	default:
-		break;
-
 	}
 }
 
@@ -448,6 +435,7 @@ void Game::updateGame() {
 						player->setX(600);
 					}
 					else if (player->getY() <= 40 && player->getX() >= 522 && player->getX() <= 588) {
+
 						//Top
 						newRoom();
 						player->setY(600);
@@ -641,5 +629,127 @@ void Game::destroyAllEntities() {
 	if (containers.size() != 0) {
 		for (int i = 0; i < containers.size(); i++)	containers.erase(containers.begin() + i);
 		containers.clear();
+	}
+	
+}
+
+void Game::Pause() {
+	//We set a frame during the user cannot use buttons
+	timer();
+	if (buttonFrame) {
+		//If we are not on the mainMenu, the escape key will do something
+		if (buttonType != 0) {
+			//If we are in pause, we quit the pause, if we are not, we get in pause
+			if (!pause) {
+				pause = true;
+				buttonType = 1;
+				pauseButton = new Button("drawable/button_resume.gif", getScreenWidth() / 2 - 160, 256);
+				mainMenu = new Button("drawable/button_main_menu.gif", getScreenWidth() / 2 - 160, 384);
+				buttons.push_back(*pauseButton);
+				buttons.push_back(*mainMenu);
+				pause_logo = new Container("drawable/endButton.jpg", getScreenWidth() / 2 - 225, 20, 225, 100);
+				containers.push_back(*pause_logo);
+			}
+			else {
+				pause = false;
+				buttonType = 2;
+				buttons.erase(buttons.begin());
+				buttons.clear();
+				containers.erase(containers.begin());
+			}
+			buttonFrame = false;
+		}
+	};
+}
+
+void Game::AddController(int id)
+{
+	if (SDL_IsGameController(id)) {
+		// If the added device is a controller, we open it.
+		pad = SDL_GameControllerOpen(id);
+		if (pad) {
+			// If the pad is openned, we take its joystick and give him an instance ID.
+			SDL_Joystick *joy = SDL_GameControllerGetJoystick(pad);
+			int instanceID = SDL_JoystickInstanceID(joy);
+
+			// We have to map the controller. Each controller have a different mapping.
+			// Mapping Source : https://github.com/gabomdq/SDL_GameControllerDB
+			SDL_GameControllerAddMappingsFromFile("controller_mapping/gamecontrollerdb_205");
+			std::cout << "Controller Added" << std::endl;
+		}
+	}
+}
+
+void Game::RemoveController(int id)
+{
+	// When the controller is removed, we simply close it.
+	SDL_GameControllerClose(pad);
+	pad = NULL;
+	std::cout << "Controller Removed" << std::endl;
+}
+
+void Game::OnControllerAxis(const SDL_ControllerAxisEvent sdlEvent) {
+
+	if (player != nullptr) {
+		if (sdlEvent.axis == 0) {
+			// X Axis motion (Right or Left axis motion)
+			if (sdlEvent.value < -DEAD_ZONE) {
+				std::cout << "X Axis Moved Left" << std::endl;
+				// LEFT MOVEMENT.
+				player->move(2);
+			}
+			else if (sdlEvent.value > DEAD_ZONE) {
+				std::cout << "X Axis Moved Right" << std::endl;
+				// RIGHT Movement.
+				player->move(3);
+			}
+			else {
+				player->stopMove();
+			}
+		}
+		else if (sdlEvent.axis == 1) {
+			// Y Axis motion (Up or Down axis motion)
+			if (sdlEvent.value < -DEAD_ZONE) {
+				std::cout << "Y Axis Moved Up" << std::endl;
+				// UP ? Movement
+				player->move(0);
+			}
+			else if (sdlEvent.value > DEAD_ZONE) {
+				std::cout << "Y Axis Moved Down" << std::endl;
+				player->move(1);
+			}
+			else {
+				player->stopMove();
+			}
+		}
+	}
+}
+
+void Game::OnControllerButton(const SDL_ControllerButtonEvent sdlEvent) {
+	std::cout << "Button Pressed" << std::endl;
+	if (player != nullptr) {
+		switch (sdlEvent.button) {
+		case SDL_CONTROLLER_BUTTON_Y:
+			std::cout << sdlEvent.button << "Up Attack" << std::endl;
+			attack(0);
+			break;
+		case SDL_CONTROLLER_BUTTON_A:
+			std::cout << sdlEvent.button << "Down Attack" << std::endl;
+			attack(1);
+			break;
+		case SDL_CONTROLLER_BUTTON_X:
+			std::cout << sdlEvent.button << "Left Attack" << std::endl;
+			attack(2);
+			break;
+		case SDL_CONTROLLER_BUTTON_B:
+			std::cout << sdlEvent.button << "Right Attack" << std::endl;
+			attack(3);
+			break;
+		case SDL_CONTROLLER_BUTTON_START:
+			std::cout << "Pause Button" << std::endl;
+			Pause();
+			break;
+
+		}
 	}
 }

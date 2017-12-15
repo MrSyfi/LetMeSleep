@@ -42,7 +42,8 @@ public:
 
 	void drawGame();																				//This function manage the renderer.
 	void destroyGame();																				//This function destroy the game.
-	void destroyAllEntities();																		//This function removes all entities present from the game.
+	void destroyAllEntities();
+	void Pause();
 	bool running() { return isRunning; }
 
 	static void addTitle(int id, int x, int y);
@@ -50,6 +51,15 @@ public:
 	static SDL_Renderer *renderer;
 	static SDL_Event event;
 	static std::vector<Collider*> colliders;
+
+	//This function removes all entities present from the game.
+	void AddController(int id);
+
+	void RemoveController(int id);
+
+	void OnControllerAxis(const SDL_ControllerAxisEvent sdlEvent);
+
+	void OnControllerButton(const SDL_ControllerButtonEvent sdlEvent);
 
 
 private:
@@ -88,6 +98,9 @@ private:
 	//Corresponds to the score the player will make	 during a game
 	int score;
 
+	SDL_GameController* pad;
+
+	static const int DEAD_ZONE;
 
 };
 
