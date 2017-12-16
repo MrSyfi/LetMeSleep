@@ -26,7 +26,7 @@ vector<Button> buttons;
 vector<Container> containers;
 vector<Item> items;
 Player* player;
-Container* menu_logo, *pause_logo, *about_logo;
+Container *menu_logo, *pause_logo, *about_logo, *tuto;
 Monster* enemy;
 Map* map;
 Boss* boss;
@@ -251,10 +251,13 @@ void Game::handleEvents() {
 						if (buttons.at(0).isOnTop(x, y)) {
 							for (int i = 0; i < buttons.size(); i++) buttons.erase(buttons.begin() + i);
 							buttons.clear();
-							score = 0;
-							clickStart();
 							containers.erase(containers.begin());
-							buttonType = 2;
+							containers.clear();
+							buttonType = 4;
+							start = new Button("drawable/button_start.gif", getScreenWidth() / 2 - 160, 500);
+							buttons.push_back(*start);
+							tuto = new Container("drawable/tutorial.gif", 0, 0, 640, 250);
+							containers.push_back(*tuto);
 							buttonFrame = false;
 						}
 						else if (buttons.at(1).isOnTop(x, y)) {
@@ -321,6 +324,16 @@ void Game::handleEvents() {
 							buttonType = 0;
 							buttonFrame = false;
 						} break;
+					case 4: 
+						if (buttons.at(0).isOnTop(x, y)) {
+							for (int i = 0; i < buttons.size(); i++) buttons.erase(buttons.begin() + i);
+							buttons.clear();
+							score = 0;
+							clickStart();
+							containers.erase(containers.begin());
+							buttonType = 2;
+							buttonFrame = 0;
+						}
 					default: break;
 					}
 				}
@@ -372,7 +385,7 @@ void Game::newRoom() {
 	map->addMap();
 	player->newRoom();
 	for (int i = 0; i < items.size(); i++) {
-		if (!items.at(i).isActi()) items.erase(items.begin() + i);
+		if (items.at(i).getType() != 2) items.erase(items.begin() + i);
 	}
 }
 
@@ -450,15 +463,17 @@ void Game::updateGame() {
 		for (int i = 0; i < enemys.size(); ) {
 			if (enemys.at(i).getHealth() <= 0) {
 				score += 2;
-				int rand = std::rand() % 5 + 1;
+				int rand = std::rand() % 2 + 1;
 				if (rand == 1) {
-					int randActivable = std::rand() % 3 + 1;
-					if (randActivable == 1) {
-						item = new Item("drawable/itemActivable.gif", enemys.at(i).getX(), enemys.at(i).getY(), true);
+					int randItem = std::rand() % 4 + 1;
+					switch (randItem) {
+					case 1: item = new Item("drawable/item.gif", enemys.at(i).getX(), enemys.at(i).getY(), 1);
+						items.push_back(*item); break;
+					case 2: item = new Item("drawable/item.gif", enemys.at(i).getX(), enemys.at(i).getY(), 1);
+						items.push_back(*item); break;
+					case 3: item = new Item("drawable/itemActivable.gif", enemys.at(i).getX(), enemys.at(i).getY(), 2);
 						items.push_back(*item);
-					}
-					else {
-						item = new Item("drawable/item.gif", enemys.at(i).getX(), enemys.at(i).getY(), false);
+					case 4: item = new Item("drawable/healingPotion.gif", enemys.at(i).getX(), enemys.at(i).getY(), 3);
 						items.push_back(*item);
 					}
 				}
@@ -516,20 +531,21 @@ void Game::updateGame() {
 			items.at(i).update(0);
 			items.at(i).collideWith(player);
 			if (items.at(i).isColl()) {
-				if (!items.at(i).isActi()) {
-					if (items.at(i).isDefense()) if (defense > 3) defense--;
-					else if (weakness <= 2) weakness++;
-					items.erase(items.begin() + i);
-				}
-				else {
-					items.erase(items.begin() + i);
+				switch (items.at(i).getType()) {
+				case 1: if (items.at(i).isDefense()) if (defense > 3) defense--; //We update the values of defense or weakness depending of the item
+						else if (weakness <= 2) weakness++;
+						items.erase(items.begin() + i); break;
+				case 2: items.erase(items.begin() + i); //If it is an activable item ,the player can use its smartBomb
 					item = new Item("drawable/itemActivable.gif", 0, 0, true);
 					items.push_back(*item);
-					player->setActi(true);
+					player->setActi(true); break;
+				case 3: items.erase(items.begin() + i); //If it is an healing potion, the player gets 20 HP back
+					player->setHealth(player->getHealth() + 20);
+					if (player->getHealth() > 100) player->setHealth(100);
 				}
 			}
-		}
 
+		}
 	}
 	if (buttons.size() != 0) {
 		for (int i = 0; i < buttons.size(); i++) buttons.at(i).update(0);
@@ -546,47 +562,31 @@ void Game::drawGame() {
 	//This is where we would add stuff to render;
 	map->drawMap(widthscreen, heightscreen);
 	if (!pause) {
-		
 		//ECS
 		for (auto& t : tiles) {
-
 			t->draw();
-
 		}
 		for (auto& e : ennemies) {
-
 			e->draw();
-
 		}
-
 		if (player != nullptr) 	player->drawGameObject();
 		if (enemys.size() != 0) {
-			for (int i = 0; i < enemys.size(); i++) {
-				enemys.at(i).drawGameObject();
-			}
+			for (int i = 0; i < enemys.size(); i++) enemys.at(i).drawGameObject();
 		}
 		if (attacks.size() != 0) {
-			for (int i = 0; i < attacks.size(); i++) {
-				attacks.at(i).drawGameObject();
-			}
+			for (int i = 0; i < attacks.size(); i++) attacks.at(i).drawGameObject();
 		}
 		if (items.size() != 0) {
-			for (int i = 0; i < items.size(); i++) {
-				items.at(i).drawGameObject();
-			}
+			for (int i = 0; i < items.size(); i++) items.at(i).drawGameObject();
 		}
 		if (boss != nullptr) boss->drawGameObject();
 	}
 	if (buttons.size() != 0) {
-		for (int i = 0; i < buttons.size(); i++) {
-			buttons.at(i).drawGameObject();
-		}
+		for (int i = 0; i < buttons.size(); i++) buttons.at(i).drawGameObject();
 	}
 
 	if (containers.size() != 0) {
-		for (int i = 0; i < containers.size(); i++) {
-			containers.at(i).drawGameObject();
-		}
+		for (int i = 0; i < containers.size(); i++) containers.at(i).drawGameObject();
 	}
 	//Update the screen
 	SDL_RenderPresent(renderer);
@@ -630,7 +630,7 @@ void Game::destroyAllEntities() {
 		for (int i = 0; i < containers.size(); i++)	containers.erase(containers.begin() + i);
 		containers.clear();
 	}
-	
+
 }
 
 void Game::Pause() {
