@@ -29,7 +29,6 @@ Map::Map(int width, int height)
 	doorLeft = TextureManager::LoadTexture("map_texture/doorLeft.gif");
 
 	loadMap("map_layouts/layout_menu.txt");
-	//addMap();
 	//Equivalent to src.x = 0 & src.y = 0
 	srcRect.x = srcRect.y = 0;
 	srcRect.w = destRec.w = width/20;
@@ -42,7 +41,7 @@ Map::Map(int width, int height)
 
 Map::~Map()
 {
-
+	//We free every texture from the map when we destroy it
 	SDL_DestroyTexture(tile);
 	SDL_DestroyTexture(desk);
 	SDL_DestroyTexture(wall);
@@ -76,27 +75,6 @@ void Map::loadMap(std::string path)
 			}
 		}
 	}
-
-	/*char tile;
-	std::fstream file;
-
-	file.open(path);
-
-	for (int i = 0; i < height; i++) {
-
-		for (int j = 0; j < width; j++) {
-
-			file.get(tile);
-			Game::addTitle(atoi(&tile), i * 32, j * 32);
-			std::cout << "done";
-
-		}
-
-	}
-
-	file.close();*/
-
-
 }
 
 void Map::drawMap(int width, int height) {
@@ -105,11 +83,12 @@ void Map::drawMap(int width, int height) {
 
 	for (int i = 0; i < 20; i++) {
 		for (int j = 0; j < 20; j++) {
-
+			//We get the value of the current tile 
 			type = map[i][j];
 
 			destRec.x = j * width/20;
 			destRec.y = i * height/20;
+			//Depending on the value, we draw a different tile
 			switch (type) {
 
 			case 0 : 

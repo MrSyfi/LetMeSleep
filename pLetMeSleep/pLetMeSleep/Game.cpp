@@ -128,6 +128,7 @@ void Game::buildGame(const char* title, int xpos, int ypos, int width, int heigh
 void Game::timer() {
 	//Defines if the user can press a button or not at the moment
 	long delta = SDL_GetTicks() - tButton;
+	//Buttons can be used again after 0.2s
 	if (delta > 200) {
 		buttonFrame = true;
 		tButton = SDL_GetTicks();
@@ -144,6 +145,7 @@ void Game::attack(int i) {
 		Attack * at = new Attack("drawable/animShoot.gif", x, y);
 		at->move(i);
 		attacks.push_back(*at);
+		//We start again the timer
 		t0 = SDL_GetTicks();
 	}
 }
@@ -167,6 +169,7 @@ void Game::clickStart() {
 	//This method will create the player, change the map and add new enemies to the room.
 	player = new Player("drawable/player.gif", 10, 40);
 	addEnemies();
+	//We load a random map
 	map->addMap();
 }
 
@@ -179,7 +182,8 @@ void Game::addEnemies() {
 }
 
 void Game::addBoss() {
-	boss = new Boss(("drawable/prof" + std::to_string(randomNbMonster(3)) + ".gif").c_str(), randomPosition(1), randomPosition(2));
+	//Add the boss on the map
+	boss = new Boss(("drawable/prof" + std::to_string(randomNbMonster(3)) + ".gif").c_str(), getScreenWidth()/2, getScreenHeight()/2);
 }
 int Game::randomPosition(int i) {
 	//Gives a random X or Y to the enemy, while being at at least 50 pixels from the player
@@ -203,6 +207,7 @@ void Game::handleEvents() {
 		case SDL_KEYDOWN:
 			if (player != nullptr) {
 				switch (event.key.keysym.scancode) {
+				//The player will move in a different direction following the key the user pressed
 				case SDL_SCANCODE_W:	player->move(0); break;
 				case SDL_SCANCODE_S:	player->move(1); break;
 				case SDL_SCANCODE_A:	player->move(2); break;
@@ -216,8 +221,10 @@ void Game::handleEvents() {
 					player->setActi(false);
 				}; break;
 				case SDL_SCANCODE_ESCAPE:
+					//Triggers the pause
 					Pause();
 					break;
+				//Will trigger an attack at the player's position following the key the user pressed
 				case SDL_SCANCODE_UP: attack(0); break;
 				case SDL_SCANCODE_DOWN: attack(1); break;
 				case SDL_SCANCODE_LEFT: attack(2); break;
@@ -249,6 +256,7 @@ void Game::handleEvents() {
 					switch (buttonType) {
 					case 0: //MainMenu
 						if (buttons.at(0).isOnTop(x, y)) {
+							//Triggers the beginning of the game
 							for (int i = 0; i < buttons.size(); i++) buttons.erase(buttons.begin() + i);
 							buttons.clear();
 							containers.erase(containers.begin());
@@ -261,6 +269,7 @@ void Game::handleEvents() {
 							buttonFrame = false;
 						}
 						else if (buttons.at(1).isOnTop(x, y)) {
+							//Will show informations about the game to the user
 							buttonType = 4;
 							for (int i = 0; i < buttons.size(); i++) buttons.erase(buttons.begin() + i);
 							buttons.clear();
@@ -273,6 +282,7 @@ void Game::handleEvents() {
 							buttonFrame = false;
 						}
 						else if (buttons.at(2).isOnTop(x, y)) {
+							//Quits the application by changing isRunning value
 							isRunning = false;
 						}
 						; break;
@@ -326,6 +336,7 @@ void Game::handleEvents() {
 						} break;
 					case 4: 
 						if (buttons.at(0).isOnTop(x, y)) {
+							//After the user has access to the little tutorial, the game can be played
 							for (int i = 0; i < buttons.size(); i++) buttons.erase(buttons.begin() + i);
 							buttons.clear();
 							score = 0;
@@ -338,7 +349,7 @@ void Game::handleEvents() {
 					}
 				}
 			}
-
+		//Gaming controller management
 		case SDL_CONTROLLERDEVICEADDED:
 			AddController(event.cdevice.which); break;
 		case SDL_CONTROLLERDEVICEREMOVED:
@@ -384,6 +395,7 @@ void Game::newRoom() {
 	}
 	map->addMap();
 	player->newRoom();
+	//The items don't change rooms, so we remove them - except the bomb
 	for (int i = 0; i < items.size(); i++) {
 		if (items.at(i).getType() != 2) items.erase(items.begin() + i);
 	}
@@ -408,10 +420,6 @@ void Game::updateGame() {
 			if (player->getHealth() <= 0) {
 				//Destroy all the current entities, remove the current layout and adds the gameover Button
 				destroyAllEntities();
-				//The player loses 10 points if he dies
-				score -= 10;
-				if (score < 0) score = 0;
-				std::cout << "Score : " << score << std::endl;
 				map->loadMap("map_layout/layout_menu.txt");
 				containers.push_back(*menu_logo);
 				gameEnded = new Button("drawable/button_game_over.gif", getScreenWidth() / 2 - 160, 256);
@@ -430,6 +438,8 @@ void Game::updateGame() {
 				else {
 					//Changes the room when all enemies have been killed and the player steps on one of the doors
 					//As it is a sort of random maze where the player is "teleported", the previous room is not saved in memory
+					
+					//The numbers used are the X and Y values of the doors
 					if (player->getX() >= 1216 && player->getY() >= 256 && player->getY() <= 288) {
 						//Right
 						newRoom();
@@ -456,97 +466,103 @@ void Game::updateGame() {
 				}
 			}
 		}
-
-	}
-
-	if (enemys.size() != 0) {
-		for (int i = 0; i < enemys.size(); ) {
-			if (enemys.at(i).getHealth() <= 0) {
-				score += 2;
-				int rand = std::rand() % 2 + 1;
-				if (rand == 1) {
-					int randItem = std::rand() % 4 + 1;
-					switch (randItem) {
-					case 1: item = new Item("drawable/item.gif", enemys.at(i).getX(), enemys.at(i).getY(), 1);
-						items.push_back(*item); break;
-					case 2: item = new Item("drawable/item.gif", enemys.at(i).getX(), enemys.at(i).getY(), 1);
-						items.push_back(*item); break;
-					case 3: item = new Item("drawable/itemActivable.gif", enemys.at(i).getX(), enemys.at(i).getY(), 2);
-						items.push_back(*item);
-					case 4: item = new Item("drawable/healingPotion.gif", enemys.at(i).getX(), enemys.at(i).getY(), 3);
-						items.push_back(*item);
+		if (enemys.size() != 0) {
+			for (int i = 0; i < enemys.size(); ) {
+				if (enemys.at(i).getHealth() <= 0) {
+					//When an enemy dies, there is a 20% chance he will drop an item
+					int rand = std::rand() % 5 + 1;
+					if (rand == 1) {
+						//After that, there is 50% chance it is a normal item
+						//25% chance it is an activable item
+						//25% chance it is a "healing" potion
+						int randItem = std::rand() % 4 + 1;
+						switch (randItem) {
+						case 1: item = new Item("drawable/item.gif", enemys.at(i).getX(), enemys.at(i).getY(), 1);
+							items.push_back(*item); break;
+						case 2: item = new Item("drawable/item.gif", enemys.at(i).getX(), enemys.at(i).getY(), 1);
+							items.push_back(*item); break;
+						case 3: item = new Item("drawable/itemActivable.gif", enemys.at(i).getX(), enemys.at(i).getY(), 2);
+							items.push_back(*item);
+						case 4: item = new Item("drawable/healingPotion.gif", enemys.at(i).getX(), enemys.at(i).getY(), 3);
+							items.push_back(*item);
+						}
 					}
+					//We finally remove the enemy from the game
+					enemys.erase(enemys.begin() + i);
+
 				}
-
-				enemys.erase(enemys.begin() + i);
-
+				else {
+					//If the enemy is not dead, we update him
+					enemys.at(i).update(weakness);
+					if (player != nullptr) {
+						//Artificial intelligence
+						enemys.at(i).pathFinding(player);
+					}
+					if (attacks.size() != 0) {
+						//Collision with the attacks the player has made
+						for (int j = 0; j < attacks.size(); j++) {
+							enemys.at(i).collideWith(new Attack(attacks.at(j)));
+						}
+					}
+					i++;
+				}
+			}
+		}
+		if (boss != nullptr) {
+			if (boss->getHealth() <= 0) {
+				//When the boss is dead, we go to the Game over menu
+				destroyAllEntities();
+				containers.push_back(*menu_logo);
+				map->loadMap("map_layout/layout_menu.txt");
+				gameEnded = new Button("drawable/button_game_over.gif", getScreenWidth() / 2 - 160, 256);
+				buttons.push_back(*gameEnded);
 			}
 			else {
-				enemys.at(i).update(weakness);
-				if (player != nullptr) {
-					enemys.at(i).pathFinding(player);
-				}
+				boss->update(weakness);
+				if (player != nullptr) boss->pathFinding(player);
 				if (attacks.size() != 0) {
-					for (int j = 0; j < attacks.size(); j++) {
-						enemys.at(i).collideWith(new Attack(attacks.at(j)));
+					for (int j = 0; j < attacks.size(); j++) boss->collideWith(new Attack(attacks.at(j)));
+				}
+			}
+		}
+		if (attacks.size() != 0) {
+			for (int i = 0; i < attacks.size();) {
+				if (attacks.at(i).getX() >= 1280 || attacks.at(i).getX() <= 0 || attacks.at(i).getY() <= 0 || attacks.at(i).getY() >= 640) {
+					//We erase the attack from the game if it goes out of the screen borders
+					attacks.erase(attacks.begin() + i);
+				}
+				else {
+					attacks.at(i).update(0);
+					i++;
+				}
+			}
+		}
+		if (items.size() != 0) {
+			for (int i = 0; i < items.size(); i++) {
+				items.at(i).update(0);
+				//We check if the player is on the current item
+				items.at(i).collideWith(player);
+				if (items.at(i).isColl()) {
+					//If he is on the current item, we check what type the item is
+					switch (items.at(i).getType()) {
+					case 1: if (items.at(i).isDefense()) if (defense > 3) defense--; //We update the values of defense or weakness depending of the item
+							else if (weakness <= 2) weakness++;
+							items.erase(items.begin() + i); break;
+					case 2: items.erase(items.begin() + i); //If it is an activable item ,the player can use its smartBomb
+						item = new Item("drawable/itemActivable.gif", 0, 0, true);
+						items.push_back(*item);
+						player->setActi(true); break;
+					case 3: items.erase(items.begin() + i); //If it is an healing potion, the player gets 20 HP back
+						player->setHealth(player->getHealth() + 20);
+						if (player->getHealth() > 100) player->setHealth(100);
 					}
 				}
-				i++;
-			}
-		}
-	}
-	if (boss != nullptr) {
-		if (boss->getHealth() <= 0) {
-			score += 15;
-			//When the boss is dead, we go to the Game over menu
-			destroyAllEntities();
-			containers.push_back(*menu_logo);
-			map->loadMap("map_layout/layout_menu.txt");
-			gameEnded = new Button("drawable/button_game_over.gif", getScreenWidth() / 2 - 160, 256);
-			buttons.push_back(*gameEnded);
-		}
-		else {
-			boss->update(weakness);
-			if (player != nullptr) boss->pathFinding(player);
-			if (attacks.size() != 0) {
-				for (int j = 0; j < attacks.size(); j++) boss->collideWith(new Attack(attacks.at(j)));
-			}
-		}
-	}
-	if (attacks.size() != 0) {
-		for (int i = 0; i < attacks.size();) {
-			if (attacks.at(i).getX() >= 1280 || attacks.at(i).getX() <= 0 || attacks.at(i).getY() <= 0 || attacks.at(i).getY() >= 640) {
-				//We erase the attack from the game if it goes out of the screen borders
-				attacks.erase(attacks.begin() + i);
-			}
-			else {
-				attacks.at(i).update(0);
-				i++;
-			}
-		}
-	}
 
-	if (items.size() != 0) {
-		for (int i = 0; i < items.size(); i++) {
-			items.at(i).update(0);
-			items.at(i).collideWith(player);
-			if (items.at(i).isColl()) {
-				switch (items.at(i).getType()) {
-				case 1: if (items.at(i).isDefense()) if (defense > 3) defense--; //We update the values of defense or weakness depending of the item
-						else if (weakness <= 2) weakness++;
-						items.erase(items.begin() + i); break;
-				case 2: items.erase(items.begin() + i); //If it is an activable item ,the player can use its smartBomb
-					item = new Item("drawable/itemActivable.gif", 0, 0, true);
-					items.push_back(*item);
-					player->setActi(true); break;
-				case 3: items.erase(items.begin() + i); //If it is an healing potion, the player gets 20 HP back
-					player->setHealth(player->getHealth() + 20);
-					if (player->getHealth() > 100) player->setHealth(100);
-				}
 			}
-
 		}
+
 	}
+	//Simple update of the buttons and the containers
 	if (buttons.size() != 0) {
 		for (int i = 0; i < buttons.size(); i++) buttons.at(i).update(0);
 	}

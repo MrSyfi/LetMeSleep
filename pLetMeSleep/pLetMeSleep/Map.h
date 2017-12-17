@@ -11,8 +11,6 @@ public:
 	int randomLayout(int max);
 
 	void addMap();
-
-	//static void loadMap(std::string path, int width, int height);
 	void loadMap(std::string path);
 	void drawMap(int width, int height);
 

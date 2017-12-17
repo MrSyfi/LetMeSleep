@@ -21,6 +21,7 @@ bool Button::isOnTop(int mouseX, int mouseY)
 	if (mouseX >= getX() && mouseX <= getX() + getW() && mouseY >= getY() && mouseY <= getY() + getH()) {
 		return true;
 	}
+	//If it is not, return false
 	return false;
 }
 
@@ -28,6 +29,7 @@ bool Button::isOnTop(int mouseX, int mouseY)
 
 void Button::update(int i)
 {
+	//All the buttons have the same size
 	srcRect.h = 64;
 	srcRect.w = 128;
 	srcRect.x = 0;

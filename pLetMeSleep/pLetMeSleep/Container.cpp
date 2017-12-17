@@ -20,7 +20,7 @@ Container::~Container()
 
 void Container::update(int i)
 {
-
+	//As containers can have different sizes, we use the mody and modx value we received in the constructor
 	srcRect.h = mody;
 	srcRect.w = modx;
 	srcRect.x = 0;

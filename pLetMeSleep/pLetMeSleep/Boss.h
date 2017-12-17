@@ -17,7 +17,6 @@ public:
 	Boss();
 	Boss(const char* textureSheet, int x, int y);
 	void update(int weakness);
-	//void update() override;
 	void pathFinding(Player * p);
 	~Boss();
 	void collideWith(Attack * m);

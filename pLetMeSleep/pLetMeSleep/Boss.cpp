@@ -17,36 +17,22 @@ Boss::Boss(const char * textureSheet, int x, int y) : Actor(textureSheet, x, y)
 
 void Boss::update(int weakness)
 {
-	srand(time(NULL));
-	
-		xpos += dx;
-		ypos += dy;
-	
+	//The boss will go as fast as the player, so we multiply the velocity values by 2
+xpos += dx*2;
+		ypos += dy*2;
 
-	int sprite = 32;
-
-
-	srcRect.h = 128;
-	srcRect.w = 128;
-	/*if (srcRect.x ==64) {
-	srcRect.x = 0;
-	srcRect.y = 0;
-	}
-	else {
-	}*/
-	srcRect.x = 0;
-	srcRect.y = 0;
-
+	srcRect.h = srcRect.w = 128;
+	srcRect.x = srcRect.y = 0;
 
 	destRect.x = xpos;
 	destRect.y = ypos;
 	destRect.w = srcRect.w * 2;
 	destRect.h = srcRect.h * 2;
-	isInvulnerable();
 
+	//Checks if the entity can be attacked again or not
+	isInvulnerable();
 	if (!invincibility) {
 		if (isCollided) {
-			std::cout << "Enemy lost " << weakness << "HP" << std::endl;
 			int temp = getHealth();
 			this->setHealth(temp - weakness);
 			isCollided = false;

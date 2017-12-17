@@ -4,7 +4,7 @@ class Actor :
 	public GameObject
 {
 private:
-	int health, maxHealth;
+	int health;
 
 public:
 	Actor();
@@ -16,9 +16,7 @@ public:
 	void stopMove();
 	~Actor();
 	int getHealth() { return health; }
-	int getMaxHealth() { return maxHealth; }
 	void setHealth(int health) { this->health = health;}
-	void setMaxHealth(int max) { this->maxHealth = max; }
 
 protected:
 	int dx, dy;

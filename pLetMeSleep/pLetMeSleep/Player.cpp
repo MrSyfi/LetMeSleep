@@ -14,7 +14,6 @@ Player::Player(const char * textureSheet, int x, int y) : Actor(textureSheet, x,
 	t0 = 0;
 	isCollided = false;
 	this->setHealth(100);
-	this->setMaxHealth(100);
 }
 
 void Player::update(int defense)
@@ -76,18 +75,13 @@ void Player::update(int defense)
 		
 	}
 
-
 	//Uses dx and dy to move the object
-
-
 
 	xpos += dx * 2;
 	ypos += dy * 2;
 
-	srcRect.h = 32;
-	srcRect.w = 32;
-	srcRect.x = 0;
-	srcRect.y = 0;
+	srcRect.h = srcRect.w = 32;
+	srcRect.x = srcRect.y = 32;
 
 	destRect.x = xpos;
 	destRect.y = ypos;
@@ -142,7 +136,9 @@ void Player::isInvulnerable() {
 }
 
 void Player::newRoom() {
+	//When the player enters a new room, he will have an invicibility frame, in case an enemy is on him
 	invicibility = true;
+	t0 = SDL_GetTicks();
 }
 
 void Player::collideWith(Monster* m)
@@ -157,17 +153,20 @@ void Player::collideWith(Monster* m)
 void Player::collideWith(Boss* b) {
 	SDL_Rect* src_p = new SDL_Rect(this->destRect);
 	SDL_Rect* src_m = new SDL_Rect(b->getRect());
+	//Changes the value of isCollided depending of the value of the collision(...) method
 	isCollided = collision(src_p->x, src_p->y, src_p->w, src_p->h, src_m->x, src_m->y, src_m->w, src_m->h);
 }
 
 bool Player::collision(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
 {
 	//Returns true if there is a collision between the player and any monster
+	
+	//Checks if x1 is inferior to x2, if not, call this method with parameters inversed
 	if (x1 <= x2) {
+		//If the "width" of the player (his position X + his width) is bigger than x2, we continue, if not, there is no collision
 		if (x1 + w1 > x2) {
-			return (((y1 < y2) && (y1 + h1 > y2)) ||
-				((y1 > y2) && (y2 + h2 > y1)) ||
-				(y1 == y2));
+			//We need to have the same behaviour for the Y axis, using the height instead
+			return (((y1 < y2) && (y1 + h1 > y2)) || ((y1 > y2) && (y2 + h2 > y1)) || (y1 == y2));
 		}
 	}
 	else {

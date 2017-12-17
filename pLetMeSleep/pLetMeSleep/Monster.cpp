@@ -17,9 +17,10 @@ Monster::Monster(const char * textureSheet, int x, int y) : Actor(textureSheet, 
 void Monster::update(int weakness)
 {
 	srand(time(NULL));
-	int random = std::rand() % 2 + 1;
-
-	if (random == 1) {
+	int random = std::rand() % 4 + 1;
+	
+	
+	if (random == 1 | random == 2 || random == 3) {
 		xpos += dx;
 		ypos += dy;
 	}
@@ -53,12 +54,9 @@ void Monster::update(int weakness)
 
 
 void Monster::pathFinding(Player * p) {
-	
-
 	//Number of pixels between the x and y positions of the monster and the player
 	int diffx = xpos - p->getX();
 	int diffy = ypos - p->getY();
-	
 	srand(time(NULL));
 	int random = std::rand() % 2 + 1;
 	// Allows to change either x or y at random
@@ -69,36 +67,27 @@ void Monster::pathFinding(Player * p) {
 		}
 		else if (diffx < 0) {
 			this->move(3);
-			
 		}
 		else if (diffy > 0) {
 			this->move(0);
-			
 		}
 		else if (diffy < 0) {
-			this->move(1);
-			
+			this->move(1);	
 		}
 	}
 	else {
 		if (diffy > 0) {
 			this->move(0);
-			
 		}
 		else if (diffy < 0) {
 			this->move(1);
-			
 		}
 		else if (diffx > 0) {
 			this->move(2);
-			
 		}
 		else if (diffx < 3) {
 			this->move(1);
-			
 		}
-
-		
 	}
 }
 
@@ -109,7 +98,6 @@ Monster::~Monster()
 void Monster::bombHit() {
 	int tmp = getHealth();
 	this->setHealth(tmp - 2);
-	std::cout << "BOMB HAS BEEN PLANTED" << std::endl;
 }
 
 void Monster::collideWith(Attack * a)
