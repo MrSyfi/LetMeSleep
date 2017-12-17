@@ -1,6 +1,5 @@
 #pragma once
 #include "Actor.h"
-#include "Collider.h"
 #include "Player.h"
 #include "Attack.h"
 #include <cstdlib>7

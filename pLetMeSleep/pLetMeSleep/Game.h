@@ -4,8 +4,6 @@
 #include <string>
 #include <vector>
 
-class Collider;
-
 class Game
 {
 public:
@@ -44,14 +42,10 @@ public:
 	void destroyGame();																				//This function destroy the game.
 	void destroyAllEntities();
 	void Pause();
-	bool running() { return isRunning; }
-
-	static void addTitle(int id, int x, int y);
+	bool running() {return isRunning;}
 	void newRoom();
 	static SDL_Renderer *renderer;
 	static SDL_Event event;
-	static std::vector<Collider*> colliders;
-
 	//This function removes all entities present from the game.
 	void AddController(int id);
 
@@ -101,7 +95,6 @@ private:
 	SDL_GameController* pad;
 
 	static const int DEAD_ZONE;
-
 };
 
 

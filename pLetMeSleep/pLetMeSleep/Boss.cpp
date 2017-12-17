@@ -11,7 +11,6 @@ Boss::Boss(const char * textureSheet, int x, int y) : Actor(textureSheet, x, y)
 	t0 = 0;
 	isCollided = false;
 	this->setHealth(40);
-	this->setMaxHealth(40);
 }
 
 

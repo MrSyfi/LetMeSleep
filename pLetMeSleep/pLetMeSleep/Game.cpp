@@ -6,18 +6,13 @@
 #include "Player.h"
 #include "Monster.h"
 #include "Map.h"
-#include "ECSystem.h"
-#include "Components.h"
 #include "time.h"
 #include "Attack.h"
 #include "Item.h"
 #include "Boss.h"
-#include "Common.h"
 #include "SDL_ttf.h"
 #include "Container.h"
 #include <vector>
-#include "Vector2D.h"
-#include "Collision.h"
 using std::vector;
 
 vector<Attack> attacks;
@@ -33,31 +28,11 @@ Boss* boss;
 Button* start, *quit, *gameEnded, *pauseButton, *mainMenu, *about;
 Item* item;
 SDL_Renderer* Game::renderer = nullptr;
-Manager manager;
-std::vector<Collider*> Game::colliders;
-auto& newPlayer(manager.addEntity());
-auto& newWall(manager.addEntity());
-auto& tile0(manager.addEntity());
-auto& tile1(manager.addEntity());
-auto& tile2(manager.addEntity());
-
 
 SDL_Event Game::event;
 
 const int Game::DEAD_ZONE = 15000;
 
-enum groupLabels : std::size_t {
-
-	groupMap,
-	groupPlayer,
-	groupEnemies,
-	groupColliders
-
-};
-
-auto& tiles(manager.getGroup(groupMap));
-auto& ennemies(manager.getGroup(groupEnemies));
-auto& colliders(manager.getGroup(groupColliders));
 
 Game::Game()
 {
@@ -107,18 +82,6 @@ void Game::buildGame(const char* title, int xpos, int ypos, int width, int heigh
 		boss = nullptr;
 		//Will seed the random at the beginning of the application for further needs
 		srand(time(NULL));
-		//ECS
-		newPlayer.addComponent<TransformComponent>(2);
-		newPlayer.addComponent<SpriteComponent>("drawable/boss.gif");
-		newPlayer.addComponent<KeyboardController>();
-		newPlayer.addComponent<Collider>("player");
-		newPlayer.addGroup(groupPlayer);
-
-		newWall.addComponent<TransformComponent>(300.0f, 300.0f, 300, 20, 1);
-		newWall.addComponent<SpriteComponent>("drawable/wall.jpg");
-		newWall.addComponent<Collider>("wall");
-		newWall.addGroup(groupMap);
-
 	}
 	else {
 		isRunning = false;
@@ -373,13 +336,6 @@ void Game::damageAllEnemies() {
 	}
 }
 
-void Game::addTitle(int id, int x, int y) {
-
-	auto& tile(manager.addEntity());
-	tile.addComponent<Tile>(id, x, y, 32, 32);
-	tile.addGroup(groupMap);
-}
-
 void Game::newRoom() {
 	//This method will decide if the next room will be a 
 	//boss room or just a normal enemies room
@@ -404,18 +360,6 @@ void Game::newRoom() {
 void Game::updateGame() {
 
 	if (!pause) {
-
-		//ECS
-		manager.refresh();
-		manager.update();
-
-		for (auto col : colliders) {
-
-
-			Collision::isCollision(newPlayer.getComponent<Collider>(), *col);
-
-		}
-
 		if (player != nullptr) {
 			if (player->getHealth() <= 0) {
 				//Destroy all the current entities, remove the current layout and adds the gameover Button
@@ -578,13 +522,6 @@ void Game::drawGame() {
 	//This is where we would add stuff to render;
 	map->drawMap(widthscreen, heightscreen);
 	if (!pause) {
-		//ECS
-		for (auto& t : tiles) {
-			t->draw();
-		}
-		for (auto& e : ennemies) {
-			e->draw();
-		}
 		if (player != nullptr) 	player->drawGameObject();
 		if (enemys.size() != 0) {
 			for (int i = 0; i < enemys.size(); i++) enemys.at(i).drawGameObject();

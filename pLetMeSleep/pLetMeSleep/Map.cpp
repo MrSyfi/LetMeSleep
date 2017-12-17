@@ -1,6 +1,5 @@
 #include "Map.h"
 #include "TextureManager.h"
-#include "Room.h"
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -19,9 +18,6 @@ Map::Map(int width, int height)
 
 	//Textures of all tile
 	tile = TextureManager::LoadTexture("map_texture/tile.gif");
-	if (tile != nullptr) {
-		std::cout << "testmap" << std::endl;
-	}
 	desk = TextureManager::LoadTexture("map_texture/desk.gif");
 	wall = TextureManager::LoadTexture("map_texture/wall.gif");
 	doorRight = TextureManager::LoadTexture("map_texture/doorRight.gif");
