@@ -18,12 +18,15 @@ Map::Map(int width, int height)
 {
 
 	//Textures of all tile
-	tile = TextureManager::LoadTexture("map_texture/tile.jpg");
-	desk = TextureManager::LoadTexture("map_texture/desk.jpg");
-	wall = TextureManager::LoadTexture("map_texture/wall.jpg");
-	doorRight = TextureManager::LoadTexture("map_texture/doorRight.jpg");
+	tile = TextureManager::LoadTexture("map_texture/tile.gif");
+	if (tile != nullptr) {
+		std::cout << "testmap" << std::endl;
+	}
+	desk = TextureManager::LoadTexture("map_texture/desk.gif");
+	wall = TextureManager::LoadTexture("map_texture/wall.gif");
+	doorRight = TextureManager::LoadTexture("map_texture/doorRight.gif");
 	bottomArrow = TextureManager::LoadTexture("map_texture/door.gif");
-	doorLeft = TextureManager::LoadTexture("map_texture/doorLeft.jpg");
+	doorLeft = TextureManager::LoadTexture("map_texture/doorLeft.gif");
 
 	loadMap("map_layouts/layout_menu.txt");
 	//addMap();

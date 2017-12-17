@@ -647,7 +647,7 @@ void Game::Pause() {
 				mainMenu = new Button("drawable/button_main_menu.gif", getScreenWidth() / 2 - 160, 384);
 				buttons.push_back(*pauseButton);
 				buttons.push_back(*mainMenu);
-				pause_logo = new Container("drawable/endButton.jpg", getScreenWidth() / 2 - 225, 20, 225, 100);
+				pause_logo = new Container("drawable/menu_logo.gif", getScreenWidth() / 2 - 225, 20, 225, 100);
 				containers.push_back(*pause_logo);
 			}
 			else {
