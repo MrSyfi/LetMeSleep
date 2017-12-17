@@ -99,7 +99,7 @@ void Player::update(int defense)
 	ypos += dy * 2;
 
 	srcRect.h = srcRect.w = 32;
-	srcRect.x = srcRect.y = 32;
+	srcRect.x = srcRect.y = 0;
 
 	destRect.x = xpos;
 	destRect.y = ypos;

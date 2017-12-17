@@ -14,7 +14,7 @@ public:
 
 	Container& operator=(const Container& a);
 	Container(const Container & a);
-
+	
 	~Container();
 };
 

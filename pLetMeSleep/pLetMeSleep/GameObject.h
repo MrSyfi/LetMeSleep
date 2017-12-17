@@ -1,7 +1,5 @@
 #pragma once
 #include "Game.h"
-#include <iostream>
-using std::string;
 class GameObject
 {
 public:
@@ -21,7 +19,6 @@ public:
 	void setY(int y) { ypos = y; }
 	int getW() const { return destRect.w; }
 	int getH() const { return destRect.h; }
-	string getTexture() const { return texturePath; }
 
 	GameObject(const GameObject &g);
 	GameObject& operator=(const GameObject &g);
@@ -29,7 +26,6 @@ public:
 	
 private:
 	
-	string texturePath;
 	SDL_Texture* entTexture;
 
 protected:

@@ -17,7 +17,6 @@ SDL_Texture* TextureManager::LoadTexture(const char* filename) {
 	SDL_Texture* text = SDL_CreateTextureFromSurface(Game::renderer, tempSurface);
 	//We clean the temporary surface
 	SDL_FreeSurface(tempSurface);
-
 	return text;
 
 }

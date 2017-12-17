@@ -419,16 +419,16 @@ void Game::updateGame() {
 						//After that, there is 50% chance it is a normal item
 						//25% chance it is an activable item
 						//25% chance it is a "healing" potion
-						int randItem = std::rand() % 4 + 1;
+						int randItem = std::rand() % 3 + 1;
 						switch (randItem) {
-						case 1: item = new Item("drawable/item.gif", enemys.at(i).getX(), enemys.at(i).getY(), 1);
+						case 1: item = new Item("drawable/item.gif", enemys.at(i).getX(), enemys.at(i).getY(), randItem);
 							items.push_back(*item); break;
-						case 2: item = new Item("drawable/item.gif", enemys.at(i).getX(), enemys.at(i).getY(), 1);
+						case 2: item = new Item("drawable/itemActivable.gif", enemys.at(i).getX(), enemys.at(i).getY(), randItem);
+							items.push_back(*item);
+							break;
+						case 3: item = new Item("drawable/healingPotion.gif", enemys.at(i).getX(), enemys.at(i).getY(), randItem);
 							items.push_back(*item); break;
-						case 3: item = new Item("drawable/itemActivable.gif", enemys.at(i).getX(), enemys.at(i).getY(), 2);
-							items.push_back(*item);
-						case 4: item = new Item("drawable/healingPotion.gif", enemys.at(i).getX(), enemys.at(i).getY(), 3);
-							items.push_back(*item);
+						default:break;
 						}
 					}
 					//We finally remove the enemy from the game
@@ -498,7 +498,8 @@ void Game::updateGame() {
 						player->setActi(true); break;
 					case 3: items.erase(items.begin() + i); //If it is an healing potion, the player gets 20 HP back
 						player->setHealth(player->getHealth() + 20);
-						if (player->getHealth() > 100) player->setHealth(100);
+						if (player->getHealth() > 100) player->setHealth(100); break;
+					default:break;
 					}
 				}
 
@@ -522,7 +523,7 @@ void Game::drawGame() {
 	//This is where we would add stuff to render;
 	map->drawMap(widthscreen, heightscreen);
 	if (!pause) {
-		if (player != nullptr) 	player->drawGameObject();
+		if (player != nullptr) player->drawGameObject();
 		if (enemys.size() != 0) {
 			for (int i = 0; i < enemys.size(); i++) enemys.at(i).drawGameObject();
 		}
