@@ -11,6 +11,10 @@ public:
 	Container();
 	Container(const char * textureSheet, int x, int y, int modx, int mody);
 	void update(int i);
+
+	Container& operator=(const Container& a);
+	Container(const Container & a);
+
 	~Container();
 };
 

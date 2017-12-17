@@ -13,6 +13,21 @@ Container::Container(const char * textureSheet, int x, int y, int modx, int mody
 }
 
 
+Container::Container(const Container& a) : GameObject(a)
+{
+	this->modx = a.modx;
+	this->mody = a.mody;
+}
+
+Container & Container::operator=(const Container & a)
+{
+	if (&a != this) {
+		GameObject::operator=(a);
+		this->modx = a.modx;
+		this->mody = a.mody;
+	}
+	return *this;
+}
 Container::~Container()
 {
 }

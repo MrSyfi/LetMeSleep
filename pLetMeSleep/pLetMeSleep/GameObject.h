@@ -1,5 +1,7 @@
 #pragma once
 #include "Game.h"
+#include <iostream>
+using std::string;
 class GameObject
 {
 public:
@@ -13,16 +15,21 @@ public:
 	void drawGameObject();
 	bool collision(SDL_Rect tmpRect);
 	SDL_Rect getRect() { return destRect; }
-	int getX() { return xpos; }
-	int getY() { return ypos; }
+	int getX() const { return xpos; }
+	int getY() const { return ypos; }
 	void setX(int x) { xpos = x; }
 	void setY(int y) { ypos = y; }
-	int getW() { return destRect.w; }
-	int getH() { return destRect.h; }
+	int getW() const { return destRect.w; }
+	int getH() const { return destRect.h; }
+	string getTexture() const { return texturePath; }
+
+	GameObject(const GameObject &g);
+	GameObject& operator=(const GameObject &g);
+
 	
 private:
 	
-	
+	string texturePath;
 	SDL_Texture* entTexture;
 
 protected:

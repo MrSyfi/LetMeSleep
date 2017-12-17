@@ -36,3 +36,15 @@ Actor::~Actor()
 }
 
 
+Actor::Actor(const Actor& a) : GameObject(a) 
+{
+
+}
+
+Actor & Actor::operator=(const Actor & a)
+{
+	if (&a != this) {
+		GameObject::operator=(a);
+	}
+	return *this;
+}

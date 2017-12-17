@@ -14,6 +14,8 @@ class Player :
 public:
 	Player();
 	Player(const char* textureSheet, int x, int y);
+	Player(const Player & a);
+	Player & operator=(const Player & a);
 	void update(int defense);
 	bool canActi();
 	void setActi(bool value);

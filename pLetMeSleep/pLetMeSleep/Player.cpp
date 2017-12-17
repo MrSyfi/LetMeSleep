@@ -16,6 +16,24 @@ Player::Player(const char * textureSheet, int x, int y) : Actor(textureSheet, x,
 	this->setHealth(100);
 }
 
+Player::Player(const Player& a) : Actor(a)
+{
+	t0 = 0;
+	isCollided = false;
+	this->setHealth(100);
+}
+
+Player & Player::operator=(const Player & a)
+{
+	if (&a != this) {
+		Actor::operator=(a);
+		this->t0 = 0;
+		this->isCollided = false;
+		this->setHealth(100);
+	}
+	return *this;
+}
+
 void Player::update(int defense)
 {
 

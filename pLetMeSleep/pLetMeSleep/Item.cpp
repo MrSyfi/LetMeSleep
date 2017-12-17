@@ -23,6 +23,23 @@ Item::~Item()
 {
 }
 
+Item::Item(const Item& a) : GameObject(a)
+{
+	srand(time(NULL));
+	this->type = a.type;
+	createItem();
+}
+
+Item & Item::operator=(const Item & a)
+{
+	srand(time(NULL));
+	if (&a != this) {
+		GameObject::operator=(a);
+		this->type = a.type;
+		createItem();
+	}
+	return *this;
+}
 
 void Item::update(int i)
 {

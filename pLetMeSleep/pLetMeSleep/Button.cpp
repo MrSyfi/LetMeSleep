@@ -15,6 +15,19 @@ Button::~Button()
 {
 }
 
+Button::Button(const Button& a) : Actor(a)
+{
+
+}
+
+Button & Button::operator=(const Button & a)
+{
+	if (&a != this) {
+		Actor::operator=(a);
+	}
+	return *this;
+}
+
 bool Button::isOnTop(int mouseX, int mouseY)
 {
 	//Checks if the mouse is on top of the button when the mouseclick has been pressed
@@ -24,6 +37,9 @@ bool Button::isOnTop(int mouseX, int mouseY)
 	//If it is not, return false
 	return false;
 }
+
+
+
 
 
 

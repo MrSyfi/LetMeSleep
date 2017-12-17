@@ -13,6 +13,23 @@ Monster::Monster(const char * textureSheet, int x, int y) : Actor(textureSheet, 
 	this->setHealth(12);
 }
 
+Monster::Monster(const Monster& a) : Actor(a)
+{
+	t0 = 0,
+	isCollided = false;
+	this->setHealth(12);
+}
+
+Monster & Monster::operator=(const Monster & a)
+{
+	if (&a != this) {
+		Actor::operator=(a);
+		this->t0 = 0;
+		this->isCollided = false;
+		this->setHealth(12);
+	}
+	return *this;
+}
 
 void Monster::update(int weakness)
 {

@@ -12,6 +12,24 @@ Boss::Boss(const char * textureSheet, int x, int y) : Actor(textureSheet, x, y)
 	isCollided = false;
 	this->setHealth(40);
 }
+Boss::Boss(const Boss& a) : Actor(a)
+{
+	this->t0 = 0;
+	this->isCollided = 0;
+	this->setHealth(40);
+}
+
+Boss & Boss::operator=(const Boss & a)
+{
+	if (&a != this) {
+		Actor::operator=(a);
+		this->t0 = 0;
+		this->isCollided = 0;
+		this->setHealth(40);
+	}
+	return *this;
+}
+
 
 
 void Boss::update(int weakness)

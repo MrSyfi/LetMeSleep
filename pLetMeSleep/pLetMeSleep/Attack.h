@@ -13,6 +13,9 @@ public:
 	Attack();
 	~Attack();
 	Attack(const char* textureSheet, int x, int y);
+
+	Attack(const Attack &a);
+	Attack & operator=(const Attack & a);
 protected:
 	int dx, dy;
 };

@@ -36,3 +36,20 @@ bool GameObject::collision(SDL_Rect  tmpRect) {
 	if ((tmpRect.x >= this->destRect.x + this->destRect.w) || (tmpRect.x + tmpRect.w <= this->destRect.x) || (tmpRect.y >= this->destRect.y + this->destRect.h) || (tmpRect.y + this->destRect.h <= this->destRect.y)) return false;
 	return true;
 }
+
+GameObject::GameObject(const GameObject & g)
+{
+	this->entTexture = g.entTexture;
+	this->xpos = g.xpos;
+	this->ypos = g.ypos;
+}
+
+GameObject & GameObject::operator=(const GameObject & g)
+{
+	if (&g != this) {
+		this->entTexture = g.entTexture;
+		this->xpos = g.xpos;
+		this->ypos = g.ypos;
+	}
+	return *this;
+}

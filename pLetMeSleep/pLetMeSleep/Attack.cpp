@@ -11,6 +11,19 @@ Attack::Attack(const char * textureSheet, int x, int y) : GameObject(textureShee
 {
 }
 
+Attack::Attack(const Attack& a) : GameObject(a)
+{
+
+}
+
+Attack & Attack::operator=(const Attack & a)
+{
+	if (&a != this) {
+		GameObject::operator=(a);
+	}
+	return *this;
+}
+
 
 void Attack::move(int i)
 {

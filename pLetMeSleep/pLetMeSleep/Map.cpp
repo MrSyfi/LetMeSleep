@@ -47,6 +47,7 @@ Map::~Map()
 
 }
 
+
 int Map::randomLayout(int max) {
 	//Generates a random number to switch between random layouts for the current room
 

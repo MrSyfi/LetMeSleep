@@ -15,6 +15,8 @@ public:
 	void move(int i);
 	void stopMove();
 	~Actor();
+	Actor(const Actor & a);
+	Actor & operator=(const Actor & a);
 	int getHealth() { return health; }
 	void setHealth(int health) { this->health = health;}
 
